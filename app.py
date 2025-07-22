@@ -10,7 +10,7 @@ def get_db():
     return psycopg.connect(
         dbname="inmosuite",
         user="inmosuite_user",
-        password="GlNtF89gavaJzBX3Vv3gGyzPe3vdOwGM",
+        password="GlNtF89gavaJzBX3Vv3jGyzPe3vdOwGM",
         host="dpg-d1smp82li9vc73c8hsr0-a.frankfurt-postgres.render.com",
         port="5432",
         sslmode="require",
