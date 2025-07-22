@@ -34,22 +34,25 @@ def get_properties():
     if feed == "resales":
         table = "resales_properties"
         image_table = "resales_property_images"
+        image_column = "image_url"
     elif feed == "kyero":
         table = "kyero_properties"
         image_table = "kyero_property_images"
+        image_column = "url"
     else:
         table = "propmls_properties"
         image_table = "propmls_property_images"
+        image_column = "url"
 
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(f"""
                 SELECT p.ref, p.price, p.beds, p.baths, p.town,
-                    (SELECT image_url FROM {image_table} i 
-                    WHERE i.property_id = p.ref AND image_order = 1
-                    LIMIT 1) AS cover_image
+                    (SELECT {image_column} FROM {image_table} i 
+                     WHERE i.property_id = p.ref AND image_order = 1
+                     LIMIT 1) AS cover_image
                 FROM {table} p
-                ORDER BY ref DESC  -- changed from created_at
+                ORDER BY ref DESC
                 LIMIT %s OFFSET %s
             """, (per_page, offset))
 
