@@ -27,7 +27,7 @@ def serve_static(path):
 def get_properties():
     feed = request.args.get('feed')
     page = int(request.args.get('page', 1))
-    per_page = 18
+    per_page = int(request.args.get('per_page', 18))  # 👈 Dynamic per_page
     offset = (page - 1) * per_page
     next_offset = page * per_page
 

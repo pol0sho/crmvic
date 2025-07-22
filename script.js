@@ -6,21 +6,37 @@ const pageCache = {};  // 🧠 Cache pages in memory: { "resales-1": [...], "kye
 const grid = document.getElementById("properties-grid");
 const pageInfo = document.getElementById("pageInfo");
 
-function getCacheKey(feed, page) {
-  return `${feed}-${page}`;
+function getCacheKey(feed, page, perPage) {
+  return `${feed}-${page}-${perPage}`;
 }
 
+function getItemsPerPage() {
+  const gridWidth = window.innerWidth;
+  const gridHeight = window.innerHeight - 200; // subtract padding/buttons/etc
+
+  const cardWidth = 240;  // includes padding/gap
+  const cardHeight = 280; // includes padding, image, info
+
+  const columns = Math.floor(gridWidth / cardWidth);
+  const rows = Math.floor(gridHeight / cardHeight);
+
+  return Math.max(columns * rows, 6); // at least 6 items
+}
+
+let lastPerPage = getItemsPerPage(); // used for resize detection
+
 function fetchProperties(feed, page) {
-  const cacheKey = getCacheKey(feed, page);
+  const perPage = getItemsPerPage();
+  const cacheKey = getCacheKey(feed, page, perPage);
 
   if (pageCache[cacheKey]) {
     renderProperties(pageCache[cacheKey]);
     pageInfo.textContent = `Page ${page}`;
-    preloadNextPage(feed, page + 1); // still preload next
+    preloadNextPage(feed, page + 1);
     return;
   }
 
-  fetch(`/api/properties?feed=${feed}&page=${page}`)
+  fetch(`/api/properties?feed=${feed}&page=${page}&per_page=${perPage}`)
     .then(res => res.json())
     .then(data => {
       const properties = data.properties || [];
@@ -36,10 +52,11 @@ function fetchProperties(feed, page) {
 }
 
 function preloadNextPage(feed, page) {
-  const nextKey = getCacheKey(feed, page);
-  if (pageCache[nextKey]) return; // already cached
+  const perPage = getItemsPerPage();
+  const nextKey = getCacheKey(feed, page, perPage);
+  if (pageCache[nextKey]) return;
 
-  fetch(`/api/properties?feed=${feed}&page=${page}`)
+  fetch(`/api/properties?feed=${feed}&page=${page}&per_page=${perPage}`)
     .then(res => res.json())
     .then(data => {
       pageCache[nextKey] = data.properties || [];
@@ -82,6 +99,15 @@ document.getElementById("nextPage").addEventListener("click", () => {
 document.getElementById("prevPage").addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
+    fetchProperties(currentFeed, currentPage);
+  }
+});
+
+window.addEventListener('resize', () => {
+  const newPerPage = getItemsPerPage();
+  if (newPerPage !== lastPerPage) {
+    lastPerPage = newPerPage;
+    pageCache = {}; // optional: clear cache to force correct layout
     fetchProperties(currentFeed, currentPage);
   }
 });
