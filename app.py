@@ -58,7 +58,9 @@ def get_properties():
                          AND image_order = 1
                          LIMIT 1) AS cover_image
                     FROM {table} p
-                    ORDER BY ref DESC
+                    ORDER BY 
+                        COALESCE(p.created_at::timestamp, now()) DESC,
+                        ref DESC
                     LIMIT %s OFFSET %s
                 """, (per_page, start_offset))
                 return cur.fetchall()
@@ -68,7 +70,7 @@ def get_properties():
 
     return jsonify({
         "properties": current_page,
-        "next": next_page
+        "next": next_page  # preload next page to reduce lag
     })
 
 if __name__ == "__main__":
