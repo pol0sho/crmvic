@@ -44,12 +44,18 @@ def get_properties():
         image_table = "propmls_property_images"
         image_column = "url"
 
+    # ✅ Determine if we need to cast ref to integer
+    if feed in ["kyero", "propmls"]:
+        ref_cast = "CAST(p.ref AS INTEGER)"
+    else:
+        ref_cast = "p.ref"
+
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(f"""
                 SELECT p.ref, p.price, p.beds, p.baths, p.town,
                     (SELECT {image_column} FROM {image_table} i 
-                     WHERE i.property_id = p.ref AND image_order = 1
+                     WHERE i.property_id = {ref_cast} AND image_order = 1
                      LIMIT 1) AS cover_image
                 FROM {table} p
                 ORDER BY ref DESC
@@ -58,9 +64,7 @@ def get_properties():
 
             rows = cur.fetchall()
 
-    return jsonify({
-        "properties": rows
-    })
+    return jsonify({"properties": rows})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
