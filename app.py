@@ -8,7 +8,7 @@ def get_db():
     return psycopg.connect(
         dbname="inmosuite",
         user="inmosuite_user",
-        password="GlNtF89gavaJzBX3Vv3gGyzPe3vdOwGM",
+        password="GlNtF89gavaJzBX3Vv3jGyzPe3vdOwGM",
         host="dpg-d1smp82li9vc73c8hsr0-a.frankfurt-postgres.render.com",
         port="5432",
         sslmode="require",
@@ -58,9 +58,7 @@ def get_properties():
                          AND image_order = 1
                          LIMIT 1) AS cover_image
                     FROM {table} p
-                    ORDER BY 
-                        COALESCE(p.created_at::timestamp, now()) DESC,
-                        ref DESC
+                    ORDER BY ref DESC
                     LIMIT %s OFFSET %s
                 """, (per_page, start_offset))
                 return cur.fetchall()
@@ -70,7 +68,7 @@ def get_properties():
 
     return jsonify({
         "properties": current_page,
-        "next": next_page  # preload next page to reduce lag
+        "next": next_page
     })
 
 if __name__ == "__main__":
