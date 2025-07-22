@@ -50,13 +50,15 @@ def get_properties():
     else:
         ref_cast = "p.ref"
 
+    ref_cast = "CAST(i.property_id AS TEXT)"  # always cast property_id to text
+
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(f"""
                 SELECT p.ref, p.price, p.beds, p.baths, p.town,
                     (SELECT {image_column} FROM {image_table} i 
-                     WHERE i.property_id = {ref_cast} AND image_order = 1
-                     LIMIT 1) AS cover_image
+                    WHERE {ref_cast} = p.ref AND image_order = 1
+                    LIMIT 1) AS cover_image
                 FROM {table} p
                 ORDER BY ref DESC
                 LIMIT %s OFFSET %s
