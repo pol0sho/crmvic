@@ -12,19 +12,18 @@ function getCacheKey(feed, page, perPage) {
 
 function getItemsPerPage() {
   const gridWidth = window.innerWidth;
-  const gridHeight = window.innerHeight - 200; // Subtract for padding and pagination
+  const gridHeight = window.innerHeight - 200; // Subtract for top/pagination
 
   const cardWidth = 400 + 16;   // card + horizontal gap
-  const cardHeight = 291 + 80;  // image + estimated text + padding
+  const cardHeight = 291 + 80;  // image + text + padding estimate
 
   const columns = Math.floor(gridWidth / cardWidth);
-  const rows = Math.floor(gridHeight / cardHeight);
+  const rawRows = Math.floor(gridHeight / cardHeight);
 
-  // Ensure we always return a multiple of columns (full rows only)
-  const fullRows = Math.max(rows, 1);
-  const itemsPerPage = columns * fullRows;
+  const rows = Math.max(rawRows, 5); // 👈 Enforce at least 4 rows
+  const itemsPerPage = columns * rows;
 
-  return Math.max(itemsPerPage, columns); // fallback: at least 1 row
+  return Math.max(itemsPerPage, columns); // fallback to 1 row if necessary
 }
 
 let lastPerPage = getItemsPerPage(); // used for resize detection
