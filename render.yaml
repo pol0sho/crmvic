@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: property-crm
+    name: property-dashboard
     env: python
-    buildCommand: ""
+    plan: free
+    buildCommand: pip install -r requirements.txt
     startCommand: python app.py
-    envVars:
-      - key: DATABASE_URL
-        value: postgresql://inmosuite_user:GlNtF89gavaJzBX3Vv3jGyzPe3vdOwGM@dpg-d1smp82li9vc73c8hsr0-a.frankfurt-postgres.render.com/inmosuite
+    runtime: python
+    pythonVersion: 3.11.9
