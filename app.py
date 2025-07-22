@@ -54,17 +54,14 @@ def get_properties_cached(feed, page, per_page):
         with conn.cursor() as cur:
             cur.execute(f"""
                 SELECT p.ref, p.price, p.beds, p.baths, p.town,
-                img.{image_column} AS cover_image,
-                CASE
-                    -- Resales Online: change w1600 to w400
-                    WHEN img.{image_column} LIKE '%resales-online.com%' THEN REPLACE(img.{image_column}, 'w1600', 'w400')
-    
-                    -- REDSP or PropMLS (no resizing support): return full size as fallback
-                    ELSE img.{image_column}
-                END AS thumbnail_image
+                    img.img_url AS cover_image,
+                    CASE
+                        WHEN img.img_url LIKE '%%resales-online.com%%' THEN REPLACE(img.img_url, 'w1600', 'w400')
+                        ELSE img.img_url
+                    END AS thumbnail_image
                 FROM {table} p
                 LEFT JOIN LATERAL (
-                    SELECT {image_column}
+                    SELECT {image_column} AS img_url
                     FROM {image_table} i
                     WHERE {image_compare_column} = {image_join_column}
                     AND image_order = 1
