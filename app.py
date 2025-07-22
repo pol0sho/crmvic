@@ -46,10 +46,10 @@ def get_properties():
             cur.execute(f"""
                 SELECT p.ref, p.price, p.beds, p.baths, p.town,
                     (SELECT image_url FROM {image_table} i 
-                     WHERE i.property_id = p.ref AND image_order = 1
-                     LIMIT 1) AS cover_image
+                    WHERE i.property_id = p.ref AND image_order = 1
+                    LIMIT 1) AS cover_image
                 FROM {table} p
-                ORDER BY created_at DESC
+                ORDER BY ref DESC  -- changed from created_at
                 LIMIT %s OFFSET %s
             """, (per_page, offset))
 
