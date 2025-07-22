@@ -71,16 +71,13 @@ function preloadNextPage(feed, page) {
 function renderProperties(properties) {
   grid.innerHTML = "";
   properties.forEach(prop => {
-    const imgSrc = prop.thumbnail_image || 'https://via.placeholder.com/300x200?text=No+Image';
-    const price = prop.price ? `€${Number(prop.price).toLocaleString()}` : "Price on request";
-
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <img loading="lazy" src="${imgSrc}" alt="Property Image" width="100%" height="291" />
-      <div class="price">${price}</div>
+      <img loading="lazy" src="${prop.cover_image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="Property Image" />
+      <div class="price">€${Number(prop.price).toLocaleString()}</div>
       <div>${prop.beds} 🛏️  |  ${prop.baths} 🛁</div>
-      <div>${prop.town || "Unknown location"}</div>
+      <div>${prop.town}</div>
       <div>Ref: ${prop.ref}</div>
     `;
     grid.appendChild(card);
