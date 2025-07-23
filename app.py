@@ -105,12 +105,12 @@ def search_across_feeds():
                     results.append({
                         "feed": feed,
                         "property": {
-                            "ref": row[0],
-                            "price": row[1],
-                            "beds": row[2],
-                            "baths": row[3],
-                            "town": row[4],
-                            "cover_image": row[5]
+                            "ref": row["ref"],
+                            "price": row["price"],
+                            "beds": row["beds"],
+                            "baths": row["baths"],
+                            "town": row["town"],
+                            "cover_image": row["cover_image"]
                         }
                     })
 
