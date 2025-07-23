@@ -117,6 +117,45 @@ function preloadNextPage(feed, page) {
     .catch(() => {});
 }
 
+document.getElementById("viewContacts").addEventListener("click", () => {
+  inSearchMode = true;
+  grid.classList.remove("fade-in");
+  grid.style.opacity = 0;
+
+  fetch("/api/contacts")
+    .then(res => res.json())
+    .then(data => {
+      grid.innerHTML = "";
+
+      data.contacts.forEach((contact, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="price">${contact.name}</div>
+          <div>${contact.email}</div>
+          <div>${contact.phone}</div>
+          <div>${contact.role}</div>
+        `;
+        grid.appendChild(card);
+
+        setTimeout(() => {
+          card.classList.add("fade-in");
+        }, i * 40);
+      });
+
+      pageInfo.textContent = `Contacts`;
+      requestAnimationFrame(() => {
+        grid.classList.add("fade-in");
+        grid.style.opacity = 1;
+      });
+    })
+    .catch(err => {
+      console.error("Contacts fetch failed:", err);
+      grid.innerHTML = "<p style='grid-column: span 6'>Failed to load contacts.</p>";
+    });
+});
+
+
 function renderProperties(properties) {
   grid.innerHTML = "";
 
