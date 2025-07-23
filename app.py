@@ -76,11 +76,11 @@ def search_across_feeds():
     if not ref:
         return jsonify([])
 
-    # feed: (property_table, image_table, image_column)
+    # feed: (property_table, image_table, image_column, image_join_column, image_compare_column)
     feeds = {
-        "resales": ("resales_properties", "resales_property_images", "image_url"),
-        "kyero": ("kyero_properties", "kyero_property_images", "url"),
-        "propmls": ("propmls_properties", "propmls_property_images", "url")
+        "resales": ("resales_properties", "resales_property_images", "image_url", "p.ref", "CAST(i.property_id AS TEXT)"),
+        "kyero": ("kyero_properties", "kyero_property_images", "url", "p.id", "i.property_id"),
+        "propmls": ("propmls_properties", "propmls_property_images", "url", "p.id", "i.property_id")
     }
 
     results = []
@@ -88,7 +88,7 @@ def search_across_feeds():
     try:
         with get_db() as conn:
             with conn.cursor() as cur:
-                for feed, (prop_table, img_table, img_col) in feeds.items():
+                for feed, (prop_table, img_table, img_col, join_left, join_right) in feeds.items():
                     print(f"🔍 Searching {feed} for ref {ref}...")
 
                     cur.execute(f"""
@@ -98,7 +98,8 @@ def search_across_feeds():
                         LEFT JOIN LATERAL (
                             SELECT {img_col}
                             FROM {img_table} i
-                            WHERE CAST(i.property_id AS TEXT) = p.ref AND image_order = 1
+                            WHERE {join_right} = {join_left}
+                              AND image_order = 1
                             LIMIT 1
                         ) img ON true
                         WHERE LOWER(p.ref) = LOWER(%s)
