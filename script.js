@@ -254,6 +254,8 @@ document.getElementById("roleFilter")?.addEventListener("change", () => {
 function updateViewControls() {
   document.getElementById("property-controls").style.display = currentView === "properties" ? "flex" : "none";
   document.getElementById("contacts-filter").style.display = currentView === "contacts" ? "flex" : "none";
+  document.getElementById("pagination").style.display =
+    currentView === "properties" || currentView === "contacts" ? "flex" : "none";
 
   document.getElementById("viewDashboard").classList.toggle("active", currentView === "dashboard");
   document.getElementById("viewProperties").classList.toggle("active", currentView === "properties");
@@ -263,3 +265,5 @@ function updateViewControls() {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("viewDashboard").click();
 });
+
+
