@@ -1,6 +1,8 @@
 let currentFeed = "resales";
 let currentPage = 1;
 let nextPageCache = [];
+let inSearchMode = false;
+
 const pageCache = {};  // 🧠 Cache pages in memory: { "resales-1": [...], "kyero-2": [...] }
 
 const grid = document.getElementById("properties-grid");
@@ -12,23 +14,25 @@ function getCacheKey(feed, page, perPage) {
 
 function getItemsPerPage() {
   const gridWidth = window.innerWidth;
-  const gridHeight = window.innerHeight - 200; // Subtract for top/pagination
+  const gridHeight = window.innerHeight - 200;
 
-  const cardWidth = 400 + 16;   // card + horizontal gap
-  const cardHeight = 291 + 80;  // image + text + padding estimate
+  const cardWidth = 400 + 16;
+  const cardHeight = 291 + 80;
 
   const columns = Math.floor(gridWidth / cardWidth);
   const rawRows = Math.floor(gridHeight / cardHeight);
 
-  const rows = Math.max(rawRows, 5); // 👈 Enforce at least 4 rows
+  const rows = Math.max(rawRows, 5);
   const itemsPerPage = columns * rows;
 
-  return Math.max(itemsPerPage, columns); // fallback to 1 row if necessary
+  return Math.max(itemsPerPage, columns);
 }
 
-let lastPerPage = getItemsPerPage(); // used for resize detection
+let lastPerPage = getItemsPerPage();
 
 function fetchProperties(feed, page) {
+  if (inSearchMode) return; // 🧱 prevent flicker during search
+
   const perPage = getItemsPerPage();
   const cacheKey = getCacheKey(feed, page, perPage);
 
@@ -58,13 +62,15 @@ document.getElementById("searchButton").addEventListener("click", () => {
   const ref = document.getElementById("searchInput").value.trim();
   if (!ref) return;
 
+  inSearchMode = true;
+
   fetch(`/api/search?ref=${encodeURIComponent(ref)}`)
     .then(res => res.json())
     .then(data => {
       if (data.length > 0) {
         renderProperties(data.map(item => ({
           ...item.property,
-          feed: item.feed // 👈 Optional if you want to show which feed it came from
+          feed: item.feed
         })));
         pageInfo.textContent = `Found in feed: ${data[0].feed} | Ref: ${ref}`;
       } else {
@@ -76,6 +82,13 @@ document.getElementById("searchButton").addEventListener("click", () => {
       console.error("Search failed:", err);
       grid.innerHTML = "<p style='grid-column: span 6'>Search failed. Try again.</p>";
     });
+});
+
+// 🔄 Allow Enter key to trigger search
+document.getElementById("searchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    document.getElementById("searchButton").click();
+  }
 });
 
 function preloadNextPage(feed, page) {
@@ -111,6 +124,7 @@ function renderProperties(properties) {
 
 document.querySelectorAll(".top-buttons button").forEach(btn => {
   btn.addEventListener("click", () => {
+    inSearchMode = false;
     currentFeed = btn.dataset.feed;
     currentPage = 1;
     nextPageCache = [];
@@ -120,22 +134,24 @@ document.querySelectorAll(".top-buttons button").forEach(btn => {
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
+  if (inSearchMode) return;
   currentPage++;
   fetchProperties(currentFeed, currentPage);
 });
 
 document.getElementById("prevPage").addEventListener("click", () => {
-  if (currentPage > 1) {
-    currentPage--;
-    fetchProperties(currentFeed, currentPage);
-  }
+  if (inSearchMode || currentPage <= 1) return;
+  currentPage--;
+  fetchProperties(currentFeed, currentPage);
 });
 
 window.addEventListener('resize', () => {
+  if (inSearchMode) return;
+
   const newPerPage = getItemsPerPage();
   if (newPerPage !== lastPerPage) {
     lastPerPage = newPerPage;
-    pageCache = {}; // optional: clear cache to force correct layout
+    pageCache = {};
     fetchProperties(currentFeed, currentPage);
   }
 });
