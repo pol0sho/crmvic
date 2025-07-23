@@ -84,7 +84,7 @@ def search_across_feeds():
 
     results = []
 
-    with connect_db() as conn:
+    with get_db() as conn:
         with conn.cursor() as cur:
             for feed, (prop_table, img_table) in feeds.items():
                 cur.execute(f"""
