@@ -3,7 +3,20 @@ import psycopg
 import os
 from functools import lru_cache
 
-app = Flask(__name__, static_url_path='', static_folder='.')
+
+app = Flask(__name__, static_folder='.', static_url_path='')
+
+@app.route('/')
+@app.route('/dashboard')
+@app.route('/properties')
+@app.route('/contacts')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+# Optional: catch-all fallback for any other path
+@app.errorhandler(404)
+def fallback(e):
+    return send_from_directory('.', 'index.html')
 
 # === DB Connection ===
 def get_db():
