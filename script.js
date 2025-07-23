@@ -107,7 +107,8 @@ function preloadNextPage(feed, page) {
 
 function renderProperties(properties) {
   grid.innerHTML = "";
-  properties.forEach(prop => {
+
+  properties.forEach((prop, i) => {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
@@ -119,6 +120,11 @@ function renderProperties(properties) {
       ${prop.feed ? `<div style="color: gray; font-size: 12px">From: ${prop.feed}</div>` : ""}
     `;
     grid.appendChild(card);
+
+    // ⏳ Fade-in effect after slight delay per item
+    setTimeout(() => {
+      card.classList.add("fade-in");
+    }, i * 40); // optional staggered effect (feel free to set to 0 if you want all at once)
   });
 }
 
