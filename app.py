@@ -84,35 +84,45 @@ def search_across_feeds():
 
     results = []
 
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            for feed, (prop_table, img_table) in feeds.items():
-                cur.execute(f"""
-                    SELECT p.ref, p.price, p.beds, p.baths, p.town,
-                        img.image_url AS cover_image
-                    FROM {prop_table} p
-                    LEFT JOIN LATERAL (
-                        SELECT image_url
-                        FROM {img_table} i
-                        WHERE i.property_id = p.ref AND image_order = 1
+    try:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                for feed, (prop_table, img_table) in feeds.items():
+                    print(f"🔍 Searching {feed} for ref {ref}...")
+
+                    cur.execute(f"""
+                        SELECT p.ref, p.price, p.beds, p.baths, p.town,
+                            img.image_url AS cover_image
+                        FROM {prop_table} p
+                        LEFT JOIN LATERAL (
+                            SELECT image_url
+                            FROM {img_table} i
+                            WHERE i.property_id = p.ref AND image_order = 1
+                            LIMIT 1
+                        ) img ON true
+                        WHERE LOWER(p.ref) = LOWER(%s)
                         LIMIT 1
-                    ) img ON true
-                    WHERE LOWER(p.ref) = LOWER(%s)
-                    LIMIT 1
-                """, (ref,))
-                row = cur.fetchone()
-                if row:
-                    results.append({
-                        "feed": feed,
-                        "property": {
-                            "ref": row["ref"],
-                            "price": row["price"],
-                            "beds": row["beds"],
-                            "baths": row["baths"],
-                            "town": row["town"],
-                            "cover_image": row["cover_image"]
-                        }
-                    })
+                    """, (ref,))
+
+                    row = cur.fetchone()
+                    print(f"➡️ Result from {feed}:", row)
+
+                    if row:
+                        results.append({
+                            "feed": feed,
+                            "property": {
+                                "ref": row["ref"],
+                                "price": row["price"],
+                                "beds": row["beds"],
+                                "baths": row["baths"],
+                                "town": row["town"],
+                                "cover_image": row["cover_image"]
+                            }
+                        })
+
+    except Exception as e:
+        print("❌ Search error:", str(e))
+        return jsonify({"error": "Search failed", "details": str(e)}), 500
 
     return jsonify(results)
 
