@@ -93,12 +93,12 @@ def search_across_feeds():
 
                     cur.execute(f"""
                         SELECT p.ref, p.price, p.beds, p.baths, p.town,
-                            img.{img_col} AS cover_image
+                               img.{img_col} AS cover_image
                         FROM {prop_table} p
                         LEFT JOIN LATERAL (
                             SELECT {img_col}
                             FROM {img_table} i
-                            WHERE i.property_id = p.ref AND image_order = 1
+                            WHERE CAST(i.property_id AS TEXT) = p.ref AND image_order = 1
                             LIMIT 1
                         ) img ON true
                         WHERE LOWER(p.ref) = LOWER(%s)
