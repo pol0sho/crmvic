@@ -12,6 +12,7 @@ body {
   flex-direction: column;
 }
 
+/* === TOP MENU === */
 .top-buttons {
   display: flex;
   justify-content: center;
@@ -56,6 +57,8 @@ body {
 .top-buttons #searchButton:hover {
   background: #117a8b;
 }
+
+/* === PROPERTY GRID === */
 .grid {
   flex: 1;
   display: grid;
@@ -73,8 +76,6 @@ body {
   padding: 10px;
   display: flex;
   flex-direction: column;
-
-  /* 🔥 Fade-in animation */
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -84,6 +85,7 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
 .card img {
   width: 100%;
   height: 291px;
@@ -102,6 +104,7 @@ body {
   margin: 2px 0;
 }
 
+/* === PAGINATION === */
 .pagination {
   display: flex;
   justify-content: center;
@@ -128,6 +131,15 @@ body {
 
 #pageInfo {
   font-weight: bold;
+}
+
+/* === CONTACT GRID === */
+#contacts-grid {
+  flex: 1;
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .contact-card {
@@ -188,7 +200,7 @@ body {
   background: #c82333;
 }
 
-/* === TOGGLE BUTTON HIGHLIGHT === */
+/* === TOGGLE BUTTONS === */
 .top-buttons button.active {
   background: #28a745;
 }
@@ -197,6 +209,7 @@ body {
   background: #6f42c1;
 }
 
+/* === FILTER BAR === */
 #property-controls {
   display: flex;
   flex-wrap: wrap;
@@ -207,7 +220,7 @@ body {
 }
 
 #contacts-filter {
-  display: none;
+  display: flex;
   justify-content: center;
   gap: 10px;
   margin: 10px 0;
@@ -218,4 +231,21 @@ body {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
+}
+
+/* === RESPONSIVE TWEAKS === */
+@media (max-width: 480px) {
+  .top-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .top-buttons input[type="text"] {
+    width: 90%;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

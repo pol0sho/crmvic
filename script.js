@@ -1,8 +1,10 @@
+let currentView = "properties";
 let currentFeed = "resales";
-let currentPage = 1;
+let propertyPage = 1;
+let contactPage = 1;
 let nextPageCache = [];
+let pageCache = {};
 let inSearchMode = false;
-let pageCache = {};  // 🧠 Cache pages in memory: { "resales-1": [...], "kyero-2": [...] }
 
 const grid = document.getElementById("properties-grid");
 const pageInfo = document.getElementById("pageInfo");
@@ -14,26 +16,21 @@ function getCacheKey(feed, page, perPage) {
 function getItemsPerPage() {
   const gridWidth = window.innerWidth;
   const gridHeight = window.innerHeight - 200;
-
   const cardWidth = 400 + 16;
   const cardHeight = 291 + 80;
-
   const columns = Math.floor(gridWidth / cardWidth);
   const rawRows = Math.floor(gridHeight / cardHeight);
   const rows = Math.max(rawRows, 5);
   const itemsPerPage = columns * rows;
-
   return Math.max(itemsPerPage, columns);
 }
 
 let lastPerPage = getItemsPerPage();
 
 function fetchProperties(feed, page) {
-  if (inSearchMode) return;
-
+  currentView = "properties";
   const perPage = getItemsPerPage();
   const cacheKey = getCacheKey(feed, page, perPage);
-
   if (pageCache[cacheKey]) {
     renderProperties(pageCache[cacheKey]);
     pageInfo.textContent = `Page ${page}`;
@@ -41,7 +38,7 @@ function fetchProperties(feed, page) {
     return;
   }
 
-  grid.classList.remove("fade-in"); // reset animation
+  grid.classList.remove("fade-in");
   grid.style.opacity = 0;
 
   fetch(`/api/properties?feed=${feed}&page=${page}&per_page=${perPage}`)
@@ -52,8 +49,6 @@ function fetchProperties(feed, page) {
       renderProperties(properties);
       nextPageCache = data.next || [];
       pageInfo.textContent = `Page ${page}`;
-
-      // Trigger fade-in after DOM update
       requestAnimationFrame(() => {
         grid.classList.add("fade-in");
         grid.style.opacity = 1;
@@ -65,10 +60,99 @@ function fetchProperties(feed, page) {
     });
 }
 
+function fetchContacts(page = 1) {
+  currentView = "contacts";
+  const perPage = 100;
+  const role = document.getElementById("roleSelect")?.value || "";
+
+  grid.classList.remove("fade-in");
+  grid.style.opacity = 0;
+
+  fetch(`/api/contacts?page=${page}&per_page=${perPage}&role=${role}`)
+    .then(res => res.json())
+    .then(data => {
+      renderContacts(data.contacts);
+      pageInfo.textContent = `Contacts - Page ${page}`;
+      requestAnimationFrame(() => {
+        grid.classList.add("fade-in");
+        grid.style.opacity = 1;
+      });
+    })
+    .catch(err => {
+      console.error("Contacts fetch failed:", err);
+      grid.innerHTML = "<p style='grid-column: span 6'>Failed to load contacts.</p>";
+    });
+}
+
+function renderProperties(properties) {
+  grid.innerHTML = "";
+  properties.forEach((prop, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img loading="lazy" src="${prop.cover_image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="Property Image" />
+      <div class="price">€${Number(prop.price).toLocaleString()}</div>
+      <div>${prop.beds} 🛏️  |  ${prop.baths} 🛁</div>
+      <div>${prop.town}</div>
+      <div>Ref: ${prop.ref}</div>
+      ${prop.feed ? `<div style="color: gray; font-size: 12px">From: ${prop.feed}</div>` : ""}
+    `;
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add("fade-in"), i * 40);
+  });
+}
+
+function renderContacts(contacts) {
+  grid.innerHTML = "";
+  contacts.forEach((contact, i) => {
+    const card = document.createElement("div");
+    card.className = "contact-card fade-in";
+    card.innerHTML = `
+      <div class="name">${contact.name}</div>
+      <div class="email">${contact.email}</div>
+      <div class="phone">📞 ${contact.phone}</div>
+      <div class="mobile">📱 ${contact.mobile || ""}</div>
+      <div class="roles">${(contact.roles || []).map(role => `<span>${role}</span>`).join("")}</div>
+      <button class="delete-button" onclick="deleteContact(${contact.id})">Delete</button>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add("fade-in"), i * 40);
+  });
+}
+
+function deleteContact(id) {
+  if (!confirm("Are you sure you want to delete this contact?")) return;
+
+  fetch(`/api/contacts/${id}`, { method: "DELETE" })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        fetchContacts(contactPage);
+      } else {
+        alert("Delete failed.");
+      }
+    });
+}
+
+function preloadNextPage(feed, page) {
+  const perPage = getItemsPerPage();
+  const nextKey = getCacheKey(feed, page, perPage);
+  if (pageCache[nextKey]) return;
+
+  fetch(`/api/properties?feed=${feed}&page=${page}&per_page=${perPage}`)
+    .then(res => res.json())
+    .then(data => {
+      pageCache[nextKey] = data.properties || [];
+      nextPageCache = data.next || [];
+    })
+    .catch(() => {});
+}
+
 document.getElementById("searchButton").addEventListener("click", () => {
   const ref = document.getElementById("searchInput").value.trim();
   if (!ref) return;
 
+  currentView = "properties";
   inSearchMode = true;
   grid.classList.remove("fade-in");
   grid.style.opacity = 0;
@@ -97,121 +181,61 @@ document.getElementById("searchButton").addEventListener("click", () => {
     });
 });
 
-document.getElementById("searchInput").addEventListener("keydown", (e) => {
+document.getElementById("searchInput").addEventListener("keydown", e => {
   if (e.key === "Enter") {
     document.getElementById("searchButton").click();
   }
 });
 
-function preloadNextPage(feed, page) {
-  const perPage = getItemsPerPage();
-  const nextKey = getCacheKey(feed, page, perPage);
-  if (pageCache[nextKey]) return;
-
-  fetch(`/api/properties?feed=${feed}&page=${page}&per_page=${perPage}`)
-    .then(res => res.json())
-    .then(data => {
-      pageCache[nextKey] = data.properties || [];
-      nextPageCache = data.next || [];
-    })
-    .catch(() => {});
-}
-
-document.getElementById("viewContacts").addEventListener("click", () => {
-  inSearchMode = true;
-  grid.classList.remove("fade-in");
-  grid.style.opacity = 0;
-
-  fetch("/api/contacts")
-    .then(res => res.json())
-    .then(data => {
-      grid.innerHTML = "";
-
-      data.contacts.forEach((contact, i) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="price">${contact.name}</div>
-          <div>${contact.email}</div>
-          <div>${contact.phone}</div>
-          <div>${contact.role}</div>
-        `;
-        grid.appendChild(card);
-
-        setTimeout(() => {
-          card.classList.add("fade-in");
-        }, i * 40);
-      });
-
-      pageInfo.textContent = `Contacts`;
-      requestAnimationFrame(() => {
-        grid.classList.add("fade-in");
-        grid.style.opacity = 1;
-      });
-    })
-    .catch(err => {
-      console.error("Contacts fetch failed:", err);
-      grid.innerHTML = "<p style='grid-column: span 6'>Failed to load contacts.</p>";
-    });
-});
-
-
-function renderProperties(properties) {
-  grid.innerHTML = "";
-
-  properties.forEach((prop, i) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img loading="lazy" src="${prop.cover_image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="Property Image" />
-      <div class="price">€${Number(prop.price).toLocaleString()}</div>
-      <div>${prop.beds} 🛏️  |  ${prop.baths} 🛁</div>
-      <div>${prop.town}</div>
-      <div>Ref: ${prop.ref}</div>
-      ${prop.feed ? `<div style="color: gray; font-size: 12px">From: ${prop.feed}</div>` : ""}
-    `;
-    grid.appendChild(card);
-
-    // Optional: stagger animation
-    setTimeout(() => {
-      card.classList.add("fade-in");
-    }, i * 40);
-  });
-}
-
 document.querySelectorAll(".top-buttons button").forEach(btn => {
   btn.addEventListener("click", () => {
-    inSearchMode = false;
-    currentFeed = btn.dataset.feed;
-    currentPage = 1;
-    nextPageCache = [];
-    pageInfo.textContent = "";
-    fetchProperties(currentFeed, currentPage);
+    const feed = btn.dataset.feed;
+    if (feed) {
+      currentView = "properties";
+      inSearchMode = false;
+      currentFeed = feed;
+      propertyPage = 1;
+      pageInfo.textContent = "";
+      fetchProperties(currentFeed, propertyPage);
+    }
   });
+});
+
+document.getElementById("viewContacts").addEventListener("click", () => {
+  inSearchMode = false;
+  contactPage = 1;
+  fetchContacts(contactPage);
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
-  if (inSearchMode) return;
-  currentPage++;
-  fetchProperties(currentFeed, currentPage);
-});
-
-document.getElementById("prevPage").addEventListener("click", () => {
-  if (inSearchMode || currentPage <= 1) return;
-  currentPage--;
-  fetchProperties(currentFeed, currentPage);
-});
-
-window.addEventListener('resize', () => {
-  if (inSearchMode) return;
-
-  const newPerPage = getItemsPerPage();
-  if (newPerPage !== lastPerPage) {
-    lastPerPage = newPerPage;
-    pageCache = {}; // Reset cache instead of reassigning
-    fetchProperties(currentFeed, currentPage);
+  if (currentView === "properties") {
+    propertyPage++;
+    fetchProperties(currentFeed, propertyPage);
+  } else if (currentView === "contacts") {
+    contactPage++;
+    fetchContacts(contactPage);
   }
 });
 
-// 🟢 Initial load
-fetchProperties(currentFeed, currentPage);
+document.getElementById("prevPage").addEventListener("click", () => {
+  if (currentView === "properties" && propertyPage > 1) {
+    propertyPage--;
+    fetchProperties(currentFeed, propertyPage);
+  } else if (currentView === "contacts" && contactPage > 1) {
+    contactPage--;
+    fetchContacts(contactPage);
+  }
+});
+
+window.addEventListener("resize", () => {
+  if (currentView !== "properties") return;
+  const newPerPage = getItemsPerPage();
+  if (newPerPage !== lastPerPage) {
+    lastPerPage = newPerPage;
+    pageCache = {};
+    fetchProperties(currentFeed, propertyPage);
+  }
+});
+
+// Initial load
+fetchProperties(currentFeed, propertyPage);

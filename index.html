@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRM vic</title>
+  <title>CRM Vic</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
+  <!-- 🔼 Top Buttons (Main View Switcher + Feed Controls) -->
   <div class="top-buttons">
     <button id="viewProperties" class="active">🏠 Properties</button>
     <button id="viewContacts">👤 Contacts</button>
 
+    <!-- 🔀 Feed + Search Controls (only visible in properties view) -->
     <div id="property-controls">
       <button data-feed="resales">Resales Online</button>
       <button data-feed="kyero">REDSP</button>
@@ -22,13 +24,10 @@
     </div>
   </div>
 
-  <!-- === Property Grid === -->
+  <!-- 🔲 Shared Grid: used for both properties and contacts -->
   <div id="properties-grid" class="grid"></div>
 
-  <!-- === Contacts Grid (Initially Hidden) === -->
-  <div id="contacts-grid" class="grid" style="display: none;"></div>
-
-  <!-- === Shared Pagination === -->
+  <!-- 📄 Pagination Info -->
   <div class="pagination">
     <button id="prevPage">Previous</button>
     <span id="pageInfo">Page 1</span>
