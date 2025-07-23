@@ -25,6 +25,28 @@ function getItemsPerPage() {
 
 let lastPerPage = getItemsPerPage();
 
+function navigateTo(view, push = true) {
+  currentView = view;
+  inSearchMode = false;
+
+  if (push) {
+    history.pushState({ view }, "", `/${view}`);
+  }
+
+  if (view === "dashboard") {
+    grid.innerHTML = "<p style='grid-column: span 6'>Welcome to your dashboard.</p>";
+    pageInfo.textContent = "Dashboard";
+  } else if (view === "properties") {
+    propertyPage = 1;
+    fetchProperties(currentFeed, propertyPage);
+  } else if (view === "contacts") {
+    contactPage = 1;
+    fetchContacts(contactPage);
+  }
+
+  updateViewControls();
+}
+
 function fetchProperties(feed, page) {
   currentView = "properties";
   updateViewControls();
@@ -147,12 +169,17 @@ function preloadNextPage(feed, page) {
     .catch(() => {});
 }
 
-document.getElementById("viewDashboard").addEventListener("click", () => {
-  currentView = "dashboard";
-  inSearchMode = false;
-  updateViewControls();
-  grid.innerHTML = "<p style='grid-column: span 6'>Welcome to your dashboard.</p>";
-  pageInfo.textContent = "Dashboard";
+document.getElementById("viewDashboard").addEventListener("click", () => navigateTo("dashboard"));
+document.getElementById("viewContacts").addEventListener("click", () => navigateTo("contacts"));
+document.getElementById("viewProperties").addEventListener("click", () => navigateTo("properties"));
+
+document.querySelectorAll(".top-buttons button[data-feed]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentFeed = btn.dataset.feed;
+    propertyPage = 1;
+    inSearchMode = false;
+    fetchProperties(currentFeed, propertyPage);
+  });
 });
 
 document.getElementById("searchButton").addEventListener("click", () => {
@@ -161,6 +188,8 @@ document.getElementById("searchButton").addEventListener("click", () => {
 
   currentView = "properties";
   inSearchMode = true;
+  history.pushState({ view: "properties" }, "", "/properties");
+
   grid.classList.remove("fade-in");
   grid.style.opacity = 0;
 
@@ -189,30 +218,6 @@ document.getElementById("searchInput").addEventListener("keydown", e => {
   if (e.key === "Enter") {
     document.getElementById("searchButton").click();
   }
-});
-
-// View toggles
-document.getElementById("viewContacts").addEventListener("click", () => {
-  currentView = "contacts";
-  inSearchMode = false;
-  contactPage = 1;
-  fetchContacts(contactPage);
-});
-
-document.getElementById("viewProperties").addEventListener("click", () => {
-  currentView = "properties";
-  inSearchMode = false;
-  propertyPage = 1;
-  fetchProperties(currentFeed, propertyPage);
-});
-
-document.querySelectorAll(".top-buttons button[data-feed]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    currentFeed = btn.dataset.feed;
-    propertyPage = 1;
-    inSearchMode = false;
-    fetchProperties(currentFeed, propertyPage);
-  });
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
@@ -262,8 +267,17 @@ function updateViewControls() {
   document.getElementById("viewContacts").classList.toggle("active", currentView === "contacts");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("viewDashboard").click();
+// 🔄 Handle browser navigation (back/forward)
+window.addEventListener("popstate", (event) => {
+  const view = event.state?.view || "dashboard";
+  navigateTo(view, false);
 });
 
-
+// 🚀 Initial load routing
+document.addEventListener("DOMContentLoaded", () => {
+  const path = window.location.pathname.replace("/", "") || "dashboard";
+  if (window.location.pathname === "/") {
+    history.replaceState({ view: "dashboard" }, "", "/dashboard");
+  }
+  navigateTo(path, false);
+});
