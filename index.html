@@ -10,11 +10,13 @@
 
   <!-- 🔼 Top Buttons (Main View Switcher + Feed Controls) -->
   <div class="top-buttons">
-    <button id="viewProperties" class="active">🏠 Properties</button>
+    <!-- 🆕 Dashboard button (now first & default) -->
+    <button id="viewDashboard" class="active">📊 Dashboard</button>
+    <button id="viewProperties">🏠 Properties</button>
     <button id="viewContacts">👤 Contacts</button>
 
     <!-- 🔀 Feed + Search Controls (only visible in properties view) -->
-    <div id="property-controls">
+    <div id="property-controls" style="display: none;">
       <button data-feed="resales">Resales Online</button>
       <button data-feed="kyero">REDSP</button>
       <button data-feed="propmls">Propmls</button>
@@ -24,17 +26,17 @@
     </div>
 
     <!-- 🔽 Role Filter (Only used in Contacts view) -->
-<div id="contacts-filter" style="display: none;">
-  <select id="roleFilter">
-    <option value="">All Roles</option>
-    <option value="Buyer">Buyers</option>
-    <option value="Seller">Sellers</option>
-    <option value="Professional">Professionals</option>
-  </select>
-</div>
+    <div id="contacts-filter" style="display: none;">
+      <select id="roleFilter">
+        <option value="">All Roles</option>
+        <option value="Buyer">Buyers</option>
+        <option value="Seller">Sellers</option>
+        <option value="Professional">Professionals</option>
+      </select>
+    </div>
   </div>
 
-  <!-- 🔲 Shared Grid: used for both properties and contacts -->
+  <!-- 🔲 Shared Grid: used for dashboard, properties and contacts -->
   <div id="properties-grid" class="grid"></div>
 
   <!-- 📄 Pagination Info -->

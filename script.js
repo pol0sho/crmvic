@@ -1,4 +1,4 @@
-let currentView = "properties";
+let currentView = "dashboard";
 let currentFeed = "resales";
 let propertyPage = 1;
 let contactPage = 1;
@@ -147,6 +147,14 @@ function preloadNextPage(feed, page) {
     .catch(() => {});
 }
 
+document.getElementById("viewDashboard").addEventListener("click", () => {
+  currentView = "dashboard";
+  inSearchMode = false;
+  updateViewControls();
+  grid.innerHTML = "<p style='grid-column: span 6'>Welcome to your dashboard.</p>";
+  pageInfo.textContent = "Dashboard";
+});
+
 document.getElementById("searchButton").addEventListener("click", () => {
   const ref = document.getElementById("searchInput").value.trim();
   if (!ref) return;
@@ -247,9 +255,11 @@ function updateViewControls() {
   document.getElementById("property-controls").style.display = currentView === "properties" ? "flex" : "none";
   document.getElementById("contacts-filter").style.display = currentView === "contacts" ? "flex" : "none";
 
+  document.getElementById("viewDashboard").classList.toggle("active", currentView === "dashboard");
   document.getElementById("viewProperties").classList.toggle("active", currentView === "properties");
   document.getElementById("viewContacts").classList.toggle("active", currentView === "contacts");
 }
 
 // 🟢 Initial load
-fetchProperties(currentFeed, propertyPage);
+fetchProperties(currentFeed, propertyPage);updateViewControls();
+document.getElementById("viewDashboard").click();
