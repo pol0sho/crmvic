@@ -76,10 +76,11 @@ def search_across_feeds():
     if not ref:
         return jsonify([])
 
+    # feed: (property_table, image_table, image_column)
     feeds = {
-        "resales": ("resales_properties", "resales_property_images"),
-        "kyero": ("kyero_properties", "kyero_property_images"),
-        "propmls": ("propmls_properties", "propmls_property_images")
+        "resales": ("resales_properties", "resales_property_images", "image_url"),
+        "kyero": ("kyero_properties", "kyero_property_images", "url"),
+        "propmls": ("propmls_properties", "propmls_property_images", "url")
     }
 
     results = []
@@ -87,15 +88,15 @@ def search_across_feeds():
     try:
         with get_db() as conn:
             with conn.cursor() as cur:
-                for feed, (prop_table, img_table) in feeds.items():
+                for feed, (prop_table, img_table, img_col) in feeds.items():
                     print(f"🔍 Searching {feed} for ref {ref}...")
 
                     cur.execute(f"""
                         SELECT p.ref, p.price, p.beds, p.baths, p.town,
-                            img.image_url AS cover_image
+                            img.{img_col} AS cover_image
                         FROM {prop_table} p
                         LEFT JOIN LATERAL (
-                            SELECT image_url
+                            SELECT {img_col}
                             FROM {img_table} i
                             WHERE i.property_id = p.ref AND image_order = 1
                             LIMIT 1
