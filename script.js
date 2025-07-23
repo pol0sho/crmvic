@@ -16,19 +16,19 @@ function getCacheKey(feed, page, perPage) {
 function getItemsPerPage() {
   const gridWidth = window.innerWidth;
   const gridHeight = window.innerHeight - 200;
-  const cardWidth = 400 + 16;
-  const cardHeight = 291 + 80;
+  const cardWidth = 416;
+  const cardHeight = 371;
   const columns = Math.floor(gridWidth / cardWidth);
-  const rawRows = Math.floor(gridHeight / cardHeight);
-  const rows = Math.max(rawRows, 5);
-  const itemsPerPage = columns * rows;
-  return Math.max(itemsPerPage, columns);
+  const rows = Math.max(Math.floor(gridHeight / cardHeight), 5);
+  return Math.max(columns * rows, columns);
 }
 
 let lastPerPage = getItemsPerPage();
 
 function fetchProperties(feed, page) {
   currentView = "properties";
+  updateViewControls();
+
   const perPage = getItemsPerPage();
   const cacheKey = getCacheKey(feed, page, perPage);
   if (pageCache[cacheKey]) {
@@ -62,13 +62,15 @@ function fetchProperties(feed, page) {
 
 function fetchContacts(page = 1) {
   currentView = "contacts";
+  updateViewControls();
+
   const perPage = 100;
-  const role = document.getElementById("roleSelect")?.value || "";
+  const role = document.getElementById("roleFilter")?.value || "";
 
   grid.classList.remove("fade-in");
   grid.style.opacity = 0;
 
-  fetch(`/api/contacts?page=${page}&per_page=${perPage}&role=${role}`)
+  fetch(`/api/contacts?page=${page}&per_page=${perPage}&role=${encodeURIComponent(role)}`)
     .then(res => res.json())
     .then(data => {
       renderContacts(data.contacts);
@@ -106,7 +108,7 @@ function renderContacts(contacts) {
   grid.innerHTML = "";
   contacts.forEach((contact, i) => {
     const card = document.createElement("div");
-    card.className = "contact-card fade-in";
+    card.className = "contact-card";
     card.innerHTML = `
       <div class="name">${contact.name}</div>
       <div class="email">${contact.email}</div>
@@ -126,11 +128,8 @@ function deleteContact(id) {
   fetch(`/api/contacts/${id}`, { method: "DELETE" })
     .then(res => res.json())
     .then(data => {
-      if (data.success) {
-        fetchContacts(contactPage);
-      } else {
-        alert("Delete failed.");
-      }
+      if (data.success) fetchContacts(contactPage);
+      else alert("Delete failed.");
     });
 }
 
@@ -161,10 +160,7 @@ document.getElementById("searchButton").addEventListener("click", () => {
     .then(res => res.json())
     .then(data => {
       if (data.length > 0) {
-        renderProperties(data.map(item => ({
-          ...item.property,
-          feed: item.feed
-        })));
+        renderProperties(data.map(item => ({ ...item.property, feed: item.feed })));
         pageInfo.textContent = `Found in feed: ${data[0].feed} | Ref: ${ref}`;
       } else {
         grid.innerHTML = "<p style='grid-column: span 6'>No property found with that reference.</p>";
@@ -187,31 +183,35 @@ document.getElementById("searchInput").addEventListener("keydown", e => {
   }
 });
 
-document.querySelectorAll(".top-buttons button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const feed = btn.dataset.feed;
-    if (feed) {
-      currentView = "properties";
-      inSearchMode = false;
-      currentFeed = feed;
-      propertyPage = 1;
-      pageInfo.textContent = "";
-      fetchProperties(currentFeed, propertyPage);
-    }
-  });
-});
-
+// View toggles
 document.getElementById("viewContacts").addEventListener("click", () => {
+  currentView = "contacts";
   inSearchMode = false;
   contactPage = 1;
   fetchContacts(contactPage);
+});
+
+document.getElementById("viewProperties").addEventListener("click", () => {
+  currentView = "properties";
+  inSearchMode = false;
+  propertyPage = 1;
+  fetchProperties(currentFeed, propertyPage);
+});
+
+document.querySelectorAll(".top-buttons button[data-feed]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentFeed = btn.dataset.feed;
+    propertyPage = 1;
+    inSearchMode = false;
+    fetchProperties(currentFeed, propertyPage);
+  });
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
   if (currentView === "properties") {
     propertyPage++;
     fetchProperties(currentFeed, propertyPage);
-  } else if (currentView === "contacts") {
+  } else {
     contactPage++;
     fetchContacts(contactPage);
   }
@@ -237,5 +237,19 @@ window.addEventListener("resize", () => {
   }
 });
 
-// Initial load
+document.getElementById("roleFilter")?.addEventListener("change", () => {
+  if (currentView === "contacts") {
+    fetchContacts(1);
+  }
+});
+
+function updateViewControls() {
+  document.getElementById("property-controls").style.display = currentView === "properties" ? "flex" : "none";
+  document.getElementById("contacts-filter").style.display = currentView === "contacts" ? "flex" : "none";
+
+  document.getElementById("viewProperties").classList.toggle("active", currentView === "properties");
+  document.getElementById("viewContacts").classList.toggle("active", currentView === "contacts");
+}
+
+// 🟢 Initial load
 fetchProperties(currentFeed, propertyPage);
