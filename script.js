@@ -260,6 +260,6 @@ function updateViewControls() {
   document.getElementById("viewContacts").classList.toggle("active", currentView === "contacts");
 }
 
-// 🟢 Initial load
-fetchProperties(currentFeed, propertyPage);updateViewControls();
-document.getElementById("viewDashboard").click();
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("viewDashboard").click();
+});
