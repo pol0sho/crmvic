@@ -70,6 +70,55 @@ def get_properties_cached(feed, page, per_page):
             has_next = len(rows) > per_page
             return rows[:per_page], has_next
         
+@app.route("/api/contacts")
+def get_contacts():
+    try:
+        role_filter = request.args.get("role")
+        page = int(request.args.get("page", 1))
+        per_page = int(request.args.get("per_page", 100))
+        offset = (page - 1) * per_page
+
+        query = "SELECT id, name, email, phone, mobile, role FROM contacts"
+        params = []
+
+        if role_filter:
+            query += " WHERE role = %s"
+            params.append(role_filter)
+
+        query += " ORDER BY id DESC LIMIT %s OFFSET %s"
+        params += [per_page, offset]
+
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, tuple(params))
+                rows = cur.fetchall()
+
+        contacts = [{
+            "id": r["id"],
+            "name": r["name"],
+            "email": r["email"],
+            "phone": r["phone"],
+            "mobile": r["mobile"],
+            "roles": [r["role"]] if r["role"] else []
+        } for r in rows]
+
+        return jsonify(contacts=contacts)
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+        
+@app.route("/api/contacts/<int:contact_id>", methods=["DELETE"])
+def delete_contact(contact_id):
+    try:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM contacts WHERE id = %s", (contact_id,))
+                conn.commit()
+        return jsonify(success=True)
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+        
 @app.route("/api/search")
 def search_across_feeds():
     ref = request.args.get("ref")

@@ -7,17 +7,28 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="top-buttons">
-  <button data-feed="resales">Resales Online</button>
-  <button data-feed="kyero">REDSP</button>
-  <button data-feed="propmls">Propmls</button>
 
-  <input type="text" id="searchInput" placeholder="Search property by reference..." />
-  <button id="searchButton" type="button">Search</button>
-</div>
+  <div class="top-buttons">
+    <button id="viewProperties" class="active">🏠 Properties</button>
+    <button id="viewContacts">👤 Contacts</button>
 
+    <div id="property-controls">
+      <button data-feed="resales">Resales Online</button>
+      <button data-feed="kyero">REDSP</button>
+      <button data-feed="propmls">Propmls</button>
+
+      <input type="text" id="searchInput" placeholder="Search property by reference..." />
+      <button id="searchButton" type="button">Search</button>
+    </div>
+  </div>
+
+  <!-- === Property Grid === -->
   <div id="properties-grid" class="grid"></div>
 
+  <!-- === Contacts Grid (Initially Hidden) === -->
+  <div id="contacts-grid" class="grid" style="display: none;"></div>
+
+  <!-- === Shared Pagination === -->
   <div class="pagination">
     <button id="prevPage">Previous</button>
     <span id="pageInfo">Page 1</span>

@@ -2,8 +2,7 @@ let currentFeed = "resales";
 let currentPage = 1;
 let nextPageCache = [];
 let inSearchMode = false;
-
-const pageCache = {};  // 🧠 Cache pages in memory: { "resales-1": [...], "kyero-2": [...] }
+let pageCache = {};  // 🧠 Cache pages in memory: { "resales-1": [...], "kyero-2": [...] }
 
 const grid = document.getElementById("properties-grid");
 const pageInfo = document.getElementById("pageInfo");
@@ -21,7 +20,6 @@ function getItemsPerPage() {
 
   const columns = Math.floor(gridWidth / cardWidth);
   const rawRows = Math.floor(gridHeight / cardHeight);
-
   const rows = Math.max(rawRows, 5);
   const itemsPerPage = columns * rows;
 
@@ -31,7 +29,7 @@ function getItemsPerPage() {
 let lastPerPage = getItemsPerPage();
 
 function fetchProperties(feed, page) {
-  if (inSearchMode) return; // 🧱 prevent flicker during search
+  if (inSearchMode) return;
 
   const perPage = getItemsPerPage();
   const cacheKey = getCacheKey(feed, page, perPage);
@@ -43,6 +41,9 @@ function fetchProperties(feed, page) {
     return;
   }
 
+  grid.classList.remove("fade-in"); // reset animation
+  grid.style.opacity = 0;
+
   fetch(`/api/properties?feed=${feed}&page=${page}&per_page=${perPage}`)
     .then(res => res.json())
     .then(data => {
@@ -51,6 +52,12 @@ function fetchProperties(feed, page) {
       renderProperties(properties);
       nextPageCache = data.next || [];
       pageInfo.textContent = `Page ${page}`;
+
+      // Trigger fade-in after DOM update
+      requestAnimationFrame(() => {
+        grid.classList.add("fade-in");
+        grid.style.opacity = 1;
+      });
     })
     .catch(err => {
       console.error("Fetch error:", err);
@@ -63,6 +70,8 @@ document.getElementById("searchButton").addEventListener("click", () => {
   if (!ref) return;
 
   inSearchMode = true;
+  grid.classList.remove("fade-in");
+  grid.style.opacity = 0;
 
   fetch(`/api/search?ref=${encodeURIComponent(ref)}`)
     .then(res => res.json())
@@ -77,6 +86,10 @@ document.getElementById("searchButton").addEventListener("click", () => {
         grid.innerHTML = "<p style='grid-column: span 6'>No property found with that reference.</p>";
         pageInfo.textContent = "";
       }
+      requestAnimationFrame(() => {
+        grid.classList.add("fade-in");
+        grid.style.opacity = 1;
+      });
     })
     .catch(err => {
       console.error("Search failed:", err);
@@ -84,7 +97,6 @@ document.getElementById("searchButton").addEventListener("click", () => {
     });
 });
 
-// 🔄 Allow Enter key to trigger search
 document.getElementById("searchInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     document.getElementById("searchButton").click();
@@ -121,10 +133,10 @@ function renderProperties(properties) {
     `;
     grid.appendChild(card);
 
-    // ⏳ Fade-in effect after slight delay per item
+    // Optional: stagger animation
     setTimeout(() => {
       card.classList.add("fade-in");
-    }, i * 40); // optional staggered effect (feel free to set to 0 if you want all at once)
+    }, i * 40);
   });
 }
 
@@ -157,9 +169,10 @@ window.addEventListener('resize', () => {
   const newPerPage = getItemsPerPage();
   if (newPerPage !== lastPerPage) {
     lastPerPage = newPerPage;
-    pageCache = {};
+    pageCache = {}; // Reset cache instead of reassigning
     fetchProperties(currentFeed, currentPage);
   }
 });
 
+// 🟢 Initial load
 fetchProperties(currentFeed, currentPage);
