@@ -64,7 +64,7 @@ function fetchContacts(page = 1) {
   currentView = "contacts";
   updateViewControls();
 
-  const perPage = 100;
+  const perPage = 60;
   const role = document.getElementById("roleFilter")?.value || "";
 
   grid.classList.remove("fade-in");
