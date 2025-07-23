@@ -54,6 +54,30 @@ function fetchProperties(feed, page) {
     });
 }
 
+document.getElementById("searchButton").addEventListener("click", () => {
+  const ref = document.getElementById("searchInput").value.trim();
+  if (!ref) return;
+
+  fetch(`/api/search?ref=${encodeURIComponent(ref)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        renderProperties(data.map(item => ({
+          ...item.property,
+          feed: item.feed // 👈 Optional if you want to show which feed it came from
+        })));
+        pageInfo.textContent = `Found in feed: ${data[0].feed} | Ref: ${ref}`;
+      } else {
+        grid.innerHTML = "<p style='grid-column: span 6'>No property found with that reference.</p>";
+        pageInfo.textContent = "";
+      }
+    })
+    .catch(err => {
+      console.error("Search failed:", err);
+      grid.innerHTML = "<p style='grid-column: span 6'>Search failed. Try again.</p>";
+    });
+});
+
 function preloadNextPage(feed, page) {
   const perPage = getItemsPerPage();
   const nextKey = getCacheKey(feed, page, perPage);
@@ -79,6 +103,7 @@ function renderProperties(properties) {
       <div>${prop.beds} 🛏️  |  ${prop.baths} 🛁</div>
       <div>${prop.town}</div>
       <div>Ref: ${prop.ref}</div>
+      ${prop.feed ? `<div style="color: gray; font-size: 12px">From: ${prop.feed}</div>` : ""}
     `;
     grid.appendChild(card);
   });

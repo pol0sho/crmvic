@@ -40,6 +40,22 @@ body {
   background: #0056b3;
 }
 
+.top-buttons input[type="text"] {
+  padding: 10px;
+  margin: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 200px;
+}
+
+.top-buttons #searchButton {
+  background: #17a2b8;
+}
+
+.top-buttons #searchButton:hover {
+  background: #117a8b;
+}
 .grid {
   flex: 1;
   display: grid;

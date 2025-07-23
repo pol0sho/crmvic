@@ -69,6 +69,52 @@ def get_properties_cached(feed, page, per_page):
             rows = cur.fetchall()
             has_next = len(rows) > per_page
             return rows[:per_page], has_next
+        
+@app.route("/api/search")
+def search_across_feeds():
+    ref = request.args.get("ref")
+    if not ref:
+        return jsonify([])
+
+    feeds = {
+        "resales": ("resales_properties", "resales_property_images"),
+        "kyero": ("kyero_properties", "kyero_property_images"),
+        "propmls": ("propmls_properties", "propmls_property_images")
+    }
+
+    results = []
+
+    with connect_db() as conn:
+        with conn.cursor() as cur:
+            for feed, (prop_table, img_table) in feeds.items():
+                cur.execute(f"""
+                    SELECT p.ref, p.price, p.beds, p.baths, p.town,
+                        img.image_url AS cover_image
+                    FROM {prop_table} p
+                    LEFT JOIN LATERAL (
+                        SELECT image_url
+                        FROM {img_table} i
+                        WHERE i.property_id = p.ref AND image_order = 1
+                        LIMIT 1
+                    ) img ON true
+                    WHERE LOWER(p.ref) = LOWER(%s)
+                    LIMIT 1
+                """, (ref,))
+                row = cur.fetchone()
+                if row:
+                    results.append({
+                        "feed": feed,
+                        "property": {
+                            "ref": row[0],
+                            "price": row[1],
+                            "beds": row[2],
+                            "baths": row[3],
+                            "town": row[4],
+                            "cover_image": row[5]
+                        }
+                    })
+
+    return jsonify(results)
 
 # === API Endpoint ===
 @app.route('/api/properties')
