@@ -6,16 +6,17 @@ from functools import lru_cache
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 
+# ✅ Serve index.html for root + dashboard/properties/contacts
 @app.route('/')
 @app.route('/dashboard')
 @app.route('/properties')
 @app.route('/contacts')
-def serve_index():
+def index():
     return send_from_directory('.', 'index.html')
 
-# Optional: catch-all fallback for any other path
+# ✅ Catch-all route for unknown paths (optional but helpful)
 @app.errorhandler(404)
-def fallback(e):
+def not_found(e):
     return send_from_directory('.', 'index.html')
 
 # === DB Connection ===
