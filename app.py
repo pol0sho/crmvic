@@ -412,66 +412,70 @@ months.forEach(month => {
 tableHtml += "</tbody></table>";
 document.getElementById("sourceTable").innerHTML = tableHtml;
 
-      months.forEach(month => {
-        if (data[month]) {
-          autoimport.push(data[month].autoimport_total);
-          wishlist.push(data[month].wishlist_total);
-          bgAuto.push('rgba(54, 162, 235, 0.6)');
-          bgWish.push('rgba(255, 99, 132, 0.6)');
-        } else {
-          autoimport.push(0);
-          wishlist.push(0);
-          bgAuto.push('rgba(200, 200, 200, 0.3)');
-          bgWish.push('rgba(180, 180, 180, 0.3)');
-        }
-      });
+const ctx = document.getElementById('inquiryChart').getContext('2d');
 
-      new Chart(document.getElementById('inquiryChart'), {
-        type: 'bar',
-        data: {
-          labels: months,
-          datasets: [
-            {
-              label: 'Autoimport Contacts',
-              data: autoimport,
-              backgroundColor: bgAuto
-            },
-            {
-              label: 'Wishlist Only',
-              data: wishlist,
-              backgroundColor: bgWish
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 1000 },
-          plugins: {
-            legend: { position: 'top' },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
-              }
-            },
-            // 🔢 Add values on top of bars
-            datalabels: {
-              anchor: 'end',
-              align: 'end',
-              color: '#333',
-              font: { weight: 'bold' },
-              formatter: value => value > 0 ? value : ''
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { stepSize: 1 }
-            }
-          }
-        },
-        plugins: [ChartDataLabels] // 👈 Activate plugin for labels
-      });
+// Gradient for autoimport bars
+const autoGradient = ctx.createLinearGradient(0, 0, 0, 400);
+autoGradient.addColorStop(0, '#58a6ff');   // light blue
+autoGradient.addColorStop(1, '#1e3a8a');   // dark blue
+
+// Gradient for wishlist bars
+const wishGradient = ctx.createLinearGradient(0, 0, 0, 400);
+wishGradient.addColorStop(0, '#a259ff');   // light purple
+wishGradient.addColorStop(1, '#3a0ca3');   // deep purple
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: 'Autoimport Contacts',
+        data: autoimport,
+        backgroundColor: autoGradient,
+        borderRadius: 4
+      },
+      {
+        label: 'Wishlist Only',
+        data: wishlist,
+        backgroundColor: wishGradient,
+        borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 1000 },
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
+        }
+      },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#ccc',
+        font: { weight: 'bold' },
+        formatter: value => value > 0 ? value : ''
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { stepSize: 1, color: '#777' },
+        grid: { color: 'rgba(255,255,255,0.05)' }
+      },
+      x: {
+        ticks: { color: '#777' },
+        grid: { display: false }
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
     })
     .catch(err => {
       alert("Failed to load data: " + err.message);
