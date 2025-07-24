@@ -399,12 +399,16 @@ const viewsData = trimmedMonths.map(month => data[month]?.property_views || 0);
               formatter: (value) => value > 0 ? value : ''
             }
           },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { stepSize: 1 }
-            }
-          }
+scales: {
+  y: {
+    min: 30000,  // 🔽 Set lower limit
+    suggestedMax: Math.max(...viewsData) + 5000, // ⬆️ Dynamic upper buffer
+    ticks: {
+      callback: (value) => value.toLocaleString(), // Optional: comma format
+      stepSize: 5000
+    }
+  }
+}
         },
         plugins: [ChartDataLabels]
       });
