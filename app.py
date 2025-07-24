@@ -3,16 +3,34 @@ import psycopg
 import os
 from datetime import datetime
 from functools import lru_cache
+from flask import request, Response
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 
-# ✅ Serve index.html for root + dashboard/properties/contacts
+
+def check_auth(username, password):
+    return username == "pol0sho" and password == "pol0sho"
+
+def authenticate():
+    return Response(
+        'Access Denied', 401,
+        {'WWW-Authenticate': 'Basic realm="Restricted Area"'}
+    )
+
+def require_auth():
+    auth = request.authorization
+    if not auth or not check_auth(auth.username, auth.password):
+        return authenticate()
+
 @app.route('/')
 @app.route('/dashboard')
 @app.route('/properties')
 @app.route('/contacts')
 def index():
+    auth_result = require_auth()
+    if auth_result:
+        return auth_result
     return send_from_directory('.', 'index.html')
 
 # ✅ Catch-all route for unknown paths (optional but helpful)
@@ -31,6 +49,7 @@ def get_db():
         sslmode="require",
         row_factory=psycopg.rows.dict_row
     )
+
 
 # === Serve Frontend Files ===
 @app.route("/")
