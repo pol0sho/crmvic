@@ -286,8 +286,7 @@ max-height: 60vh;
 <div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
-    <h3 style="text-align:center; margin-top:3rem;">Most viewed properties all time</h3>
-<div id="topViewedContainer" style="max-height: 400px; overflow-y: auto; margin: 0 auto; max-width: 700px; font-family: monospace;"></div>
+
 
 
 <script>
