@@ -240,44 +240,113 @@ def inquiries_dashboard():
     html = """
     <!DOCTYPE html>
     <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>Inquiry Statistics</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-<script>
-  // Register the plugin with Chart.js
-  Chart.register(ChartDataLabels);
-</script>
-      <style>
-        body {
-          font-family: 'Inter', sans-serif;
-          background: #f8fafc;
-          padding: 2rem;
-        }
-        h2 {
-          text-align: center;
-        }
-table, th, td {
-  border: 1px solid #ccc;
-  padding: 6px 12px;
-}
-thead {
-  background: #f1f5f9;
-}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Inquiry Statistics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script>Chart.register(ChartDataLabels);</script>
+  <style>
+    :root {
+      --bg-dark: #0e0e12;
+      --card-dark: #1c1c22;
+      --text-main: #f1f1f1;
+      --text-secondary: #7f8c8d;
+      --highlight: #00f0ff;
+      --accent: #f72585;
+    }
 
-canvas {
-  width: 100%;
-  max-width: 1400px;
-max-height: 60vh;
-  height: auto;
-  aspect-ratio: 3 / 1; /* Keep it wide and short */
-  display: block;
-  margin: 2rem auto;
-}
-      </style>
-    </head>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+    }
+
+    h2, h3 {
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: var(--highlight);
+      text-shadow: 0 0 8px var(--highlight);
+    }
+
+    h3 {
+      margin-top: 3rem;
+      color: var(--accent);
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 1400px;
+      aspect-ratio: 3 / 1;
+      display: block;
+      margin: 2rem auto;
+      background-color: var(--card-dark);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1400px;
+      margin: 2rem auto;
+      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--card-dark);
+      color: var(--text-main);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px 16px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    th {
+      background-color: #222;
+      color: var(--highlight);
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(255,255,255,0.03);
+    }
+
+    tr:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      canvas {
+        aspect-ratio: 2 / 1;
+      }
+
+      table, thead, tbody, th, td, tr {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
     <body>
       <h2>Inquiry Statistics - {{ year }}</h2>
     <h3 style="text-align:center; margin-top:3rem;"> Auto import leads</h3>
