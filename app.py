@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template_string
 import psycopg
 import os
 from functools import lru_cache
@@ -203,6 +203,110 @@ def get_properties():
         "properties": properties,
         "has_next": has_next
     })
+
+# === 📈 API for Inquiry Stats ===
+@app.route("/api/inquiries")
+def get_inquiries():
+    try:
+        with open("inquiry_stats.json", "r", encoding="utf-8") as f:
+            data = f.read()
+            return app.response_class(data, mimetype="application/json")
+    except FileNotFoundError:
+        return jsonify(error="inquiry_stats.json not found"), 404
+
+# === 📊 Dashboard HTML Page ===
+@app.route("/dashboard/inquiries")
+def inquiries_dashboard():
+    html = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>Inquiry Statistics</title>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <style>
+        body {
+          font-family: 'Inter', sans-serif;
+          background: #f8fafc;
+          padding: 2rem;
+        }
+        h2 {
+          text-align: center;
+        }
+        canvas {
+          max-width: 100%;
+          margin: auto;
+        }
+      </style>
+    </head>
+    <body>
+      <h2>📊 Inquiry Statistics - {{ year }}</h2>
+      <canvas id="inquiryChart"></canvas>
+
+      <script>
+        fetch('/api/inquiries')
+          .then(res => res.json())
+          .then(data => {
+            const year = new Date().getFullYear();
+            const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
+
+            const autoimport = [];
+            const wishlist = [];
+            const bgAuto = [];
+            const bgWish = [];
+
+            months.forEach(month => {
+              if (data[month]) {
+                autoimport.push(data[month].autoimport_total);
+                wishlist.push(data[month].wishlist_total);
+                bgAuto.push('rgba(54, 162, 235, 0.6)');
+                bgWish.push('rgba(255, 99, 132, 0.6)');
+              } else {
+                autoimport.push(0);
+                wishlist.push(0);
+                bgAuto.push('rgba(200, 200, 200, 0.3)');
+                bgWish.push('rgba(180, 180, 180, 0.3)');
+              }
+            });
+
+            new Chart(document.getElementById('inquiryChart'), {
+              type: 'bar',
+              data: {
+                labels: months,
+                datasets: [
+                  {
+                    label: 'Autoimport Contacts',
+                    data: autoimport,
+                    backgroundColor: bgAuto
+                  },
+                  {
+                    label: 'Wishlist Only',
+                    data: wishlist,
+                    backgroundColor: bgWish
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                animation: { duration: 1000 },
+                plugins: {
+                  legend: { position: 'bottom' },
+                  tooltip: {
+                    callbacks: {
+                      label: ctx => ctx.raw === 0 ? 'No data yet' : `${ctx.dataset.label}: ${ctx.raw}`
+                    }
+                  }
+                }
+              }
+            });
+          });
+      </script>
+    </body>
+    </html>
+    """
+    current_year = datetime.now().year
+    return render_template_string(html, year=current_year)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
