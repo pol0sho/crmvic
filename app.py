@@ -290,6 +290,9 @@ def inquiries_dashboard():
     canvas {
       width: 100%;
       max-width: 1400px;
+      max-height: 60vh;
+  height: auto;
+  aspect-ratio: 3 / 1; /* Keep it wide and short */
       aspect-ratio: 3 / 1;
       display: block;
       margin: 2rem auto;
