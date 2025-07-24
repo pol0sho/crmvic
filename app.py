@@ -240,117 +240,44 @@ def inquiries_dashboard():
     html = """
     <!DOCTYPE html>
     <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Real Estate Stats</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-  <script>Chart.register(ChartDataLabels);</script>
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>Inquiry Statistics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+  // Register the plugin with Chart.js
+  Chart.register(ChartDataLabels);
+</script>
+      <style>
+        body {
+          font-family: 'Inter', sans-serif;
+          background: #f8fafc;
+          padding: 2rem;
+        }
+        h2 {
+          text-align: center;
+        }
+table, th, td {
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+}
+thead {
+  background: #f1f5f9;
+}
 
-  <style>
-    :root {
-      --bg-dark: #111217;
-      --card: #1b1d25;
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent-blue: #58a6ff;
-      --accent-purple: #a259ff;
-      --border: rgba(255, 255, 255, 0.08);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 2rem;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: 'Inter', sans-serif;
-    }
-
-    h2 {
-      text-align: center;
-      font-size: 2.2rem;
-      font-weight: 600;
-      color: var(--accent-purple);
-      margin-bottom: 2rem;
-    }
-
-    h3 {
-      text-align: center;
-      color: var(--accent-blue);
-      font-size: 1.2rem;
-      margin-top: 3rem;
-      font-weight: 500;
-    }
-
-    canvas {
-      width: 100%;
-      max-width: 1200px;
-      max-height: 60vh;
-      height: auto;
-      display: block;
-      margin: 2rem auto;
-      background-color: var(--card);
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: 0 0 40px rgba(162, 89, 255, 0.12);
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      max-width: 1200px;
-      margin: 2rem auto;
-      font-family: 'JetBrains Mono', monospace;
-      background-color: var(--card);
-      color: var(--text-main);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    th, td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-
-    th {
-      background-color: #24252e;
-      color: var(--accent-blue);
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    tr:nth-child(even) {
-      background-color: rgba(255, 255, 255, 0.03);
-    }
-
-    tr:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-
-      canvas {
-        max-height: 300px;
-      }
-
-      table, th, td {
-        font-size: 0.85rem;
-      }
-    }
-  </style>
-</head>
+canvas {
+  width: 100%;
+  max-width: 1400px;
+max-height: 60vh;
+  height: auto;
+  aspect-ratio: 3 / 1; /* Keep it wide and short */
+  display: block;
+  margin: 2rem auto;
+}
+      </style>
+    </head>
     <body>
       <h2>Inquiry Statistics - {{ year }}</h2>
     <h3 style="text-align:center; margin-top:3rem;"> Auto import leads</h3>
@@ -368,7 +295,7 @@ def inquiries_dashboard():
     })
     .then(data => {
       const year = new Date().getFullYear();
-      const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
+      const months = [...Array(12).keys()].map(i => ${year}-${String(i + 1).padStart(2, '0')});
 
       const autoimport = [];
       const wishlist = [];
@@ -388,23 +315,23 @@ for (const month of months) {
 }
 const sources = Array.from(sourceSet);
 sources.forEach(source => {
-  tableHtml += `<th>${source.replace("Subject: ", "")}</th>`;
+  tableHtml += <th>${source.replace("Subject: ", "")}</th>;
 });
 tableHtml += "</tr></thead><tbody>";
 
 // Second pass: build rows
 months.forEach(month => {
   const entry = data[month];
-  tableHtml += `<tr><td>${month}</td>`;
+  tableHtml += <tr><td>${month}</td>;
   if (entry) {
-    tableHtml += `<td style='text-align:center;'>${entry.autoimport_total}</td>`;
-    tableHtml += `<td style='text-align:center;'>${entry.wishlist_total}</td>`;
+    tableHtml += <td style='text-align:center;'>${entry.autoimport_total}</td>;
+    tableHtml += <td style='text-align:center;'>${entry.wishlist_total}</td>;
     sources.forEach(source => {
       const val = entry.sources?.[source] || 0;
-      tableHtml += `<td style='text-align:center;'>${val}</td>`;
+      tableHtml += <td style='text-align:center;'>${val}</td>;
     });
   } else {
-    tableHtml += `<td colspan="${2 + sources.length}" style='text-align:center; color:#aaa;'>No data</td>`;
+    tableHtml += <td colspan="${2 + sources.length}" style='text-align:center; color:#aaa;'>No data</td>;
   }
   tableHtml += "</tr>";
 });
@@ -412,70 +339,66 @@ months.forEach(month => {
 tableHtml += "</tbody></table>";
 document.getElementById("sourceTable").innerHTML = tableHtml;
 
-const ctx = document.getElementById('inquiryChart').getContext('2d');
-
-// Gradient for autoimport bars
-const autoGradient = ctx.createLinearGradient(0, 0, 0, 400);
-autoGradient.addColorStop(0, '#58a6ff');   // light blue
-autoGradient.addColorStop(1, '#1e3a8a');   // dark blue
-
-// Gradient for wishlist bars
-const wishGradient = ctx.createLinearGradient(0, 0, 0, 400);
-wishGradient.addColorStop(0, '#a259ff');   // light purple
-wishGradient.addColorStop(1, '#3a0ca3');   // deep purple
-
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: months,
-    datasets: [
-      {
-        label: 'Autoimport Contacts',
-        data: autoimport,
-        backgroundColor: autoGradient,
-        borderRadius: 4
-      },
-      {
-        label: 'Wishlist Only',
-        data: wishlist,
-        backgroundColor: wishGradient,
-        borderRadius: 4
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 1000 },
-    plugins: {
-      legend: { position: 'top' },
-      tooltip: {
-        callbacks: {
-          label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
+      months.forEach(month => {
+        if (data[month]) {
+          autoimport.push(data[month].autoimport_total);
+          wishlist.push(data[month].wishlist_total);
+          bgAuto.push('rgba(54, 162, 235, 0.6)');
+          bgWish.push('rgba(255, 99, 132, 0.6)');
+        } else {
+          autoimport.push(0);
+          wishlist.push(0);
+          bgAuto.push('rgba(200, 200, 200, 0.3)');
+          bgWish.push('rgba(180, 180, 180, 0.3)');
         }
-      },
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-        color: '#ccc',
-        font: { weight: 'bold' },
-        formatter: value => value > 0 ? value : ''
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: { stepSize: 1, color: '#777' },
-        grid: { color: 'rgba(255,255,255,0.05)' }
-      },
-      x: {
-        ticks: { color: '#777' },
-        grid: { display: false }
-      }
-    }
-  },
-  plugins: [ChartDataLabels]
-});
+      });
+
+      new Chart(document.getElementById('inquiryChart'), {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Autoimport Contacts',
+              data: autoimport,
+              backgroundColor: bgAuto
+            },
+            {
+              label: 'Wishlist Only',
+              data: wishlist,
+              backgroundColor: bgWish
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 1000 },
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: ctx => ${ctx.dataset.label}: ${ctx.raw}
+              }
+            },
+            // 🔢 Add values on top of bars
+            datalabels: {
+              anchor: 'end',
+              align: 'end',
+              color: '#333',
+              font: { weight: 'bold' },
+              formatter: value => value > 0 ? value : ''
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        },
+        plugins: [ChartDataLabels] // 👈 Activate plugin for labels
+      });
     })
     .catch(err => {
       alert("Failed to load data: " + err.message);
