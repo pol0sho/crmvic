@@ -225,8 +225,12 @@ def inquiries_dashboard():
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       <title>Inquiry Statistics</title>
-      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+  // Register the plugin with Chart.js
+  Chart.register(ChartDataLabels);
+</script>
       <style>
         body {
           font-family: 'Inter', sans-serif;
