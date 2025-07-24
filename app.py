@@ -240,7 +240,13 @@ def inquiries_dashboard():
         h2 {
           text-align: center;
         }
-
+table, th, td {
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+}
+thead {
+  background: #f1f5f9;
+}
 
 canvas {
   width: 100%;
@@ -256,6 +262,9 @@ max-height: 60vh;
     <body>
       <h2>📊 Inquiry Statistics - {{ year }}</h2>
       <canvas id="inquiryChart"></canvas>
+      <h3 style="text-align:center; margin-top:3rem;">📄 Monthly Breakdown</h3>
+<div id="sourceTable" style="overflow-x:auto; max-width: 1000px; margin: 2rem auto; font-family: monospace;"></div>
+
 
 <script>
   fetch('/api/inquiries')
@@ -271,6 +280,43 @@ max-height: 60vh;
       const wishlist = [];
       const bgAuto = [];
       const bgWish = [];
+
+      let tableHtml = "<table style='border-collapse:collapse; width:100%;'>";
+tableHtml += "<thead><tr><th style='text-align:left;'>Month</th><th>Autoimport</th><th>Wishlist</th>";
+
+const sourceSet = new Set();
+
+// First pass: collect all sources
+for (const month of months) {
+  if (data[month]) {
+    Object.keys(data[month].sources || {}).forEach(source => sourceSet.add(source));
+  }
+}
+const sources = Array.from(sourceSet);
+sources.forEach(source => {
+  tableHtml += `<th>${source.replace("Subject: ", "")}</th>`;
+});
+tableHtml += "</tr></thead><tbody>";
+
+// Second pass: build rows
+months.forEach(month => {
+  const entry = data[month];
+  tableHtml += `<tr><td>${month}</td>`;
+  if (entry) {
+    tableHtml += `<td style='text-align:center;'>${entry.autoimport_total}</td>`;
+    tableHtml += `<td style='text-align:center;'>${entry.wishlist_total}</td>`;
+    sources.forEach(source => {
+      const val = entry.sources?.[source] || 0;
+      tableHtml += `<td style='text-align:center;'>${val}</td>`;
+    });
+  } else {
+    tableHtml += `<td colspan="${2 + sources.length}" style='text-align:center; color:#aaa;'>No data</td>`;
+  }
+  tableHtml += "</tr>";
+});
+
+tableHtml += "</tbody></table>";
+document.getElementById("sourceTable").innerHTML = tableHtml;
 
       months.forEach(month => {
         if (data[month]) {
