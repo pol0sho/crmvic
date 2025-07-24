@@ -2,6 +2,7 @@
   "2025-01": {
     "autoimport_total": 0,
     "wishlist_total": 66,
+    "property_views": 52907,
     "sources": {},
     "referrals": {
       "Idealista": 10,
@@ -22,6 +23,7 @@
   "2025-02": {
     "autoimport_total": 41,
     "wishlist_total": 33,
+    "property_views": 82816,
     "sources": {
       "Subject: Kyero.com": 8,
       "Subject: Idealista": 27,
@@ -48,6 +50,7 @@
   "2025-03": {
     "autoimport_total": 224,
     "wishlist_total": 16,
+    "property_views": 64760,
     "sources": {
       "Subject: Kyero.com": 72,
       "Subject: Idealista": 86,
@@ -70,6 +73,7 @@
   "2025-04": {
     "autoimport_total": 152,
     "wishlist_total": 8,
+    "property_views": 115140,
     "sources": {
       "Subject: Kyero.com": 50,
       "Subject: Idealista": 58,
@@ -88,6 +92,7 @@
   "2025-05": {
     "autoimport_total": 137,
     "wishlist_total": 7,
+    "property_views": 70651,
     "sources": {
       "Subject: Kyero.com": 35,
       "Subject: Idealista": 61,
@@ -108,6 +113,7 @@
   "2025-06": {
     "autoimport_total": 136,
     "wishlist_total": 16,
+    "property_views": 125401,
     "sources": {
       "Subject: Kyero.com": 38,
       "Subject: Idealista": 53,
@@ -129,6 +135,7 @@
   "2025-07": {
     "autoimport_total": 102,
     "wishlist_total": 8,
+    "property_views": 89464,
     "sources": {
       "Subject: Kyero.com": 31,
       "Subject: Idealista": 34,
@@ -148,30 +155,35 @@
   "2025-08": {
     "autoimport_total": 0,
     "wishlist_total": 0,
+    "property_views": 0,
     "sources": {},
     "referrals": {}
   },
   "2025-09": {
     "autoimport_total": 0,
     "wishlist_total": 0,
+    "property_views": 0,
     "sources": {},
     "referrals": {}
   },
   "2025-10": {
     "autoimport_total": 0,
     "wishlist_total": 0,
+    "property_views": 0,
     "sources": {},
     "referrals": {}
   },
   "2025-11": {
     "autoimport_total": 0,
     "wishlist_total": 0,
+    "property_views": 0,
     "sources": {},
     "referrals": {}
   },
   "2025-12": {
     "autoimport_total": 0,
     "wishlist_total": 0,
+    "property_views": 0,
     "sources": {},
     "referrals": {}
   }

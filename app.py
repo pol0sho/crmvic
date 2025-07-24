@@ -284,7 +284,8 @@ max-height: 60vh;
       <canvas id="inquiryChart"></canvas>
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Breakdown</h3>
 <div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
-    <h3 style="text-align:center; margin-top:3rem;"> Average property views Abracasabra.es</h3>
+    <h3 style="text-align:center; margin-top:3rem;"> Monthly property views</h3>
+    <canvas id="viewsChart"></canvas>
 
 
 <script>
@@ -351,6 +352,54 @@ document.getElementById("sourceTable").innerHTML = tableHtml;
           bgAuto.push('rgba(200, 200, 200, 0.3)');
           bgWish.push('rgba(180, 180, 180, 0.3)');
         }
+      });
+
+            // === 📈 Line Chart: Property Views ===
+      const viewsData = months.map(month => data[month]?.property_views || 0);
+      const viewColors = viewsData.map(val => val > 0 ? 'rgba(34,197,94,0.5)' : 'rgba(180,180,180,0.3)');
+
+      new Chart(document.getElementById('viewsChart'), {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Property Views',
+            data: viewsData,
+            fill: false,
+            tension: 0.3,
+            borderColor: 'rgba(34,197,94,1)',
+            backgroundColor: viewColors,
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 1000 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => `Views: ${ctx.raw}`
+              }
+            },
+            datalabels: {
+              align: 'top',
+              anchor: 'end',
+              color: '#10b981',
+              font: { weight: 'bold' },
+              formatter: (value) => value > 0 ? value : ''
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
       });
 
       new Chart(document.getElementById('inquiryChart'), {

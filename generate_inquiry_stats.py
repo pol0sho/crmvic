@@ -25,6 +25,43 @@ def get_all_months_this_year():
     now = datetime.now()
     return [f"{now.year}-{month:02d}" for month in range(1, 13)]
 
+def get_views_grouped_by_month(uid, models, db, password):
+    domain = []
+    batch_size = 5000
+    offset = 0
+    month_counts = defaultdict(int)
+
+    try:
+        all_ids = models.execute_kw(
+            db, uid, password,
+            'property.view', 'search',
+            [domain],
+            {'order': 'date asc'}
+        )
+
+        while offset < len(all_ids):
+            batch_ids = all_ids[offset:offset + batch_size]
+            records = models.execute_kw(
+                db, uid, password,
+                'property.view', 'read',
+                [batch_ids],
+                {'fields': ['date']}
+            )
+            for view in records:
+                date_str = view.get('date')
+                if date_str:
+                    try:
+                        dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+                        month_key = f"{dt.year}-{dt.month:02d}"
+                        month_counts[month_key] += 1
+                    except:
+                        pass
+            offset += batch_size
+    except Exception as e:
+        print(f"❌ View count error: {e}")
+
+    return month_counts
+
 def generate_inquiry_stats():
     uid, models, db, password = connect_to_odoo()
     if not uid:
@@ -43,12 +80,12 @@ def generate_inquiry_stats():
     months = get_all_months_this_year()
     results = {}
 
+    # 🔁 Add property views
+    views_per_month = get_views_grouped_by_month(uid, models, db, password)
+
     for month in months:
         start_date = datetime.strptime(month, "%Y-%m")
-        if start_date.month == 12:
-            end_date = datetime(start_date.year + 1, 1, 1)
-        else:
-            end_date = datetime(start_date.year, start_date.month + 1, 1)
+        end_date = (start_date + relativedelta(months=1))
         start_str = start_date.strftime("%Y-%m-%d")
         end_str = end_date.strftime("%Y-%m-%d")
 
@@ -108,6 +145,7 @@ def generate_inquiry_stats():
         results[month] = {
             "autoimport_total": len(matching_partner_ids),
             "wishlist_total": len(wishlist_only_ids),
+            "property_views": views_per_month.get(month, 0),
             "sources": dict(source_counts),
             "referrals": dict(referral_source_counts)
         }
