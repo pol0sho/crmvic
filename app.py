@@ -295,7 +295,7 @@ max-height: 60vh;
     })
     .then(data => {
       const year = new Date().getFullYear();
-      const months = [...Array(12).keys()].map(i => ${year}-${String(i + 1).padStart(2, '0')});
+      const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
 
       const autoimport = [];
       const wishlist = [];
@@ -315,23 +315,23 @@ for (const month of months) {
 }
 const sources = Array.from(sourceSet);
 sources.forEach(source => {
-  tableHtml += <th>${source.replace("Subject: ", "")}</th>;
+  tableHtml += `<th>${source.replace("Subject: ", "")}</th>`;
 });
 tableHtml += "</tr></thead><tbody>";
 
 // Second pass: build rows
 months.forEach(month => {
   const entry = data[month];
-  tableHtml += <tr><td>${month}</td>;
+  tableHtml += `<tr><td>${month}</td>`;
   if (entry) {
-    tableHtml += <td style='text-align:center;'>${entry.autoimport_total}</td>;
-    tableHtml += <td style='text-align:center;'>${entry.wishlist_total}</td>;
+    tableHtml += `<td style='text-align:center;'>${entry.autoimport_total}</td>`;
+    tableHtml += `<td style='text-align:center;'>${entry.wishlist_total}</td>`;
     sources.forEach(source => {
       const val = entry.sources?.[source] || 0;
-      tableHtml += <td style='text-align:center;'>${val}</td>;
+      tableHtml += `<td style='text-align:center;'>${val}</td>`;
     });
   } else {
-    tableHtml += <td colspan="${2 + sources.length}" style='text-align:center; color:#aaa;'>No data</td>;
+    tableHtml += `<td colspan="${2 + sources.length}" style='text-align:center; color:#aaa;'>No data</td>`;
   }
   tableHtml += "</tr>";
 });
@@ -378,7 +378,7 @@ document.getElementById("sourceTable").innerHTML = tableHtml;
             legend: { position: 'top' },
             tooltip: {
               callbacks: {
-                label: ctx => ${ctx.dataset.label}: ${ctx.raw}
+                label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
               }
             },
             // 🔢 Add values on top of bars
