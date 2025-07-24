@@ -270,6 +270,11 @@ def inquiries_dashboard():
       color: var(--text-main);
     }
 
+    html, body {
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
     h2, h3 {
       text-align: center;
       font-weight: 600;
@@ -287,20 +292,19 @@ def inquiries_dashboard():
       color: var(--accent);
     }
 
-    canvas {
-      width: 100%;
-      max-width: 1400px;
-      max-height: 60vh;
+canvas {
+  width: 100%;
+  max-width: 1400px;
   height: auto;
-  aspect-ratio: 3 / 1; /* Keep it wide and short */
-      aspect-ratio: 3 / 1;
-      display: block;
-      margin: 2rem auto;
-      background-color: var(--card-dark);
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
-    }
+  max-height: 60vh; /* ✅ constrain vertical growth */
+  aspect-ratio: 3 / 1;
+  display: block;
+  margin: 2rem auto;
+  background-color: var(--card-dark);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
+}
 
     table {
       border-collapse: collapse;
