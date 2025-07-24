@@ -286,6 +286,8 @@ max-height: 60vh;
 <div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
+    <h3 style="text-align:center; margin-top:3rem;">Most viewed properties all time</h3>
+<div id="topViewedContainer" style="max-height: 400px; overflow-y: auto; margin: 0 auto; max-width: 700px; font-family: monospace;"></div>
 
 
 <script>
@@ -459,6 +461,22 @@ scales: {
         },
         plugins: [ChartDataLabels] // 👈 Activate plugin for labels
       });
+
+      const topList = data.top_viewed_links || [];
+let listHtml = "<table style='width:100%; border-collapse:collapse;'>";
+listHtml += "<thead><tr><th style='text-align:left;'>Reference</th><th style='text-align:right;'>Views</th></tr></thead><tbody>";
+
+topList.forEach(entry => {
+  listHtml += `
+    <tr>
+      <td><a href="${entry.link}" target="_blank">${entry.ref}</a></td>
+      <td style="text-align:right;">${entry.views.toLocaleString()}</td>
+    </tr>
+  `;
+});
+
+listHtml += "</tbody></table>";
+document.getElementById("topViewedContainer").innerHTML = listHtml;
     })
     .catch(err => {
       alert("Failed to load data: " + err.message);

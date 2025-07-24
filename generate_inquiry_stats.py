@@ -25,6 +25,62 @@ def get_all_months_this_year():
     now = datetime.now()
     return [f"{now.year}-{month:02d}" for month in range(1, 13)]
 
+
+def get_top_viewed_property_links(uid, models, db, password, top_n=20):
+    view_counts = defaultdict(int)
+    batch_size = 5000
+    offset = 0
+
+    try:
+        all_ids = models.execute_kw(
+            db, uid, password,
+            'property.view', 'search',
+            [[]],
+            {'order': 'date desc'}
+        )
+
+        while offset < len(all_ids):
+            batch_ids = all_ids[offset:offset + batch_size]
+            records = models.execute_kw(
+                db, uid, password,
+                'property.view', 'read',
+                [batch_ids],
+                {'fields': ['property_id']}
+            )
+            for view in records:
+                prop = view.get('property_id')
+                if prop and isinstance(prop, list):
+                    view_counts[prop[0]] += 1
+            offset += batch_size
+
+        # Get top N property IDs
+        top_ids = sorted(view_counts.items(), key=lambda x: x[1], reverse=True)[:top_n]
+        top_property_ids = [pid for pid, _ in top_ids]
+
+        # Fetch property refs
+        properties = models.execute_kw(
+            db, uid, password,
+            'estate.property', 'read',
+            [top_property_ids],
+            {'fields': ['ref']}
+        )
+
+        links = []
+        for prop in properties:
+            ref = prop.get('ref')
+            if ref:
+                links.append({
+                    "ref": ref,
+                    "link": f"https://abracasabra-realestate.com/property/?ref_no={ref}",
+                    "views": view_counts[prop['id']]
+                })
+
+        return links
+
+    except Exception as e:
+        print(f"❌ Top viewed properties error: {e}")
+        return []
+
 def get_views_grouped_by_month(uid, models, db, password):
     domain = []
     batch_size = 5000
@@ -149,6 +205,11 @@ def generate_inquiry_stats():
             "sources": dict(source_counts),
             "referrals": dict(referral_source_counts)
         }
+
+
+
+    top_links = get_top_viewed_property_links(uid, models, db, password)
+    results["top_viewed_links"] = top_links
 
     with open("inquiry_stats.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
