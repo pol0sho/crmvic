@@ -243,19 +243,21 @@ def inquiries_dashboard():
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Inquiry Statistics</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <title>Inquiry Statistics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script>Chart.register(ChartDataLabels);</script>
+
   <style>
     :root {
-      --bg-dark: #0e0e12;
-      --card-dark: #1c1c22;
-      --text-main: #f1f1f1;
-      --text-secondary: #7f8c8d;
-      --highlight: #00f0ff;
-      --accent: #f72585;
+      --bg: #f8f8f5;
+      --card: #ffffff;
+      --text-main: #1f1f1f;
+      --text-muted: #6b7280;
+      --accent: #0069c0;
+      --highlight: #58a6ff;
+      --border: #e0e0e0;
     }
 
     * {
@@ -265,78 +267,73 @@ def inquiries_dashboard():
     body {
       margin: 0;
       padding: 2rem;
+      background-color: var(--bg);
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg-dark);
       color: var(--text-main);
     }
 
-    html, body {
-  max-height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-    h2, h3 {
-      text-align: center;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-
     h2 {
-      font-size: 2rem;
-      color: var(--highlight);
-      text-shadow: 0 0 8px var(--highlight);
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
     }
 
     h3 {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.2rem;
       margin-top: 3rem;
-      color: var(--accent);
     }
 
-canvas {
-  width: 100%;
-  max-width: 1400px;
-  height: auto;
-  max-height: 60vh; /* ✅ constrain vertical growth */
-  aspect-ratio: 3 / 1;
-  display: block;
-  margin: 2rem auto;
-  background-color: var(--card-dark);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
-}
+    canvas {
+      width: 100%;
+      max-width: 1200px;
+      max-height: 55vh;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+      background-color: var(--card);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    }
 
     table {
       border-collapse: collapse;
       width: 100%;
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 2rem auto;
-      font-family: 'JetBrains Mono', monospace;
-      background-color: var(--card-dark);
-      color: var(--text-main);
-      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
     }
 
     th, td {
-      padding: 10px 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
       text-align: center;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
     th {
-      background-color: #222;
-      color: var(--highlight);
+      background-color: #f0f2f5;
+      color: var(--accent);
+      font-weight: 600;
       text-transform: uppercase;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     tr:nth-child(even) {
-      background-color: rgba(255,255,255,0.03);
+      background-color: #fafafa;
     }
 
     tr:hover {
-      background-color: rgba(255,255,255,0.05);
+      background-color: #f3f7ff;
     }
 
     @media (max-width: 768px) {
@@ -345,10 +342,10 @@ canvas {
       }
 
       canvas {
-        aspect-ratio: 2 / 1;
+        max-height: 300px;
       }
 
-      table, thead, tbody, th, td, tr {
+      table, th, td {
         font-size: 0.85rem;
       }
     }
