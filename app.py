@@ -280,11 +280,11 @@ max-height: 60vh;
     </head>
     <body>
       <h2>Inquiry Statistics - {{ year }}</h2>
-    <h3 style="text-align:center; margin-top:3rem;"> Auto import leads</h3>
+    <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries</h3>
       <canvas id="inquiryChart"></canvas>
-      <h3 style="text-align:center; margin-top:3rem;"> Monthly Breakdown</h3>
+      <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown</h3>
 <div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
-    <h3 style="text-align:center; margin-top:3rem;"> Monthly property views</h3>
+    <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
 
 
@@ -355,23 +355,30 @@ document.getElementById("sourceTable").innerHTML = tableHtml;
       });
 
             // === 📈 Line Chart: Property Views ===
-      const viewsData = months.map(month => data[month]?.property_views || 0);
+      let lastDataIndex = months.findLastIndex(month => data[month]?.property_views > 0);
+
+// If no data, show nothing
+if (lastDataIndex === -1) lastDataIndex = 0;
+
+// Trim months and viewsData to only that range
+const trimmedMonths = months.slice(0, lastDataIndex + 1);
+const viewsData = trimmedMonths.map(month => data[month]?.property_views || 0);
       const viewColors = viewsData.map(val => val > 0 ? 'rgba(34,197,94,0.5)' : 'rgba(180,180,180,0.3)');
 
       new Chart(document.getElementById('viewsChart'), {
-        type: 'line',
-        data: {
-          labels: months,
-          datasets: [{
-            label: 'Property Views',
-            data: viewsData,
-            fill: false,
-            tension: 0.3,
-            borderColor: 'rgba(34,197,94,1)',
-            backgroundColor: viewColors,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          }]
+  type: 'line',
+  data: {
+    labels: trimmedMonths,
+    datasets: [{
+      label: 'Property Views',
+      data: viewsData,
+      fill: false,
+      tension: 0.3,
+      borderColor: 'rgba(34,197,94,1)',
+      backgroundColor: 'rgba(34,197,94,0.5)',
+      pointRadius: 5,
+      pointHoverRadius: 7
+    }]
         },
         options: {
           responsive: true,
