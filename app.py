@@ -242,9 +242,10 @@ def inquiries_dashboard():
         }
 
 
-        canvas {
-  max-width: 1000px;
-  height: 500px;
+canvas {
+  max-width: 90vw;
+  max-height: 60vh;
+  height: auto;
   display: block;
   margin: 2rem auto;
 }
