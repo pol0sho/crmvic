@@ -280,9 +280,11 @@ max-height: 60vh;
     </head>
     <body>
       <h2>Inquiry Statistics - {{ year }}</h2>
+    <h3 style="text-align:center; margin-top:3rem;"> Auto import leads</h3>
       <canvas id="inquiryChart"></canvas>
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Breakdown</h3>
 <div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
+    <h3 style="text-align:center; margin-top:3rem;"> Average property views Abracasabra.es</h3>
 
 
 <script>
