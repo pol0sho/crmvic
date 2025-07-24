@@ -225,6 +225,7 @@ def inquiries_dashboard():
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       <title>Inquiry Statistics</title>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <style>
         body {
@@ -235,74 +236,100 @@ def inquiries_dashboard():
         h2 {
           text-align: center;
         }
+
+
         canvas {
-          max-width: 100%;
-          margin: auto;
-        }
+  max-width: 1000px;
+  height: 500px;
+  display: block;
+  margin: 2rem auto;
+}
       </style>
     </head>
     <body>
       <h2>📊 Inquiry Statistics - {{ year }}</h2>
       <canvas id="inquiryChart"></canvas>
 
-      <script>
-        fetch('/api/inquiries')
-          .then(res => res.json())
-          .then(data => {
-            const year = new Date().getFullYear();
-            const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
+<script>
+  fetch('/api/inquiries')
+    .then(res => {
+      if (!res.ok) throw new Error("API call failed");
+      return res.json();
+    })
+    .then(data => {
+      const year = new Date().getFullYear();
+      const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
 
-            const autoimport = [];
-            const wishlist = [];
-            const bgAuto = [];
-            const bgWish = [];
+      const autoimport = [];
+      const wishlist = [];
+      const bgAuto = [];
+      const bgWish = [];
 
-            months.forEach(month => {
-              if (data[month]) {
-                autoimport.push(data[month].autoimport_total);
-                wishlist.push(data[month].wishlist_total);
-                bgAuto.push('rgba(54, 162, 235, 0.6)');
-                bgWish.push('rgba(255, 99, 132, 0.6)');
-              } else {
-                autoimport.push(0);
-                wishlist.push(0);
-                bgAuto.push('rgba(200, 200, 200, 0.3)');
-                bgWish.push('rgba(180, 180, 180, 0.3)');
+      months.forEach(month => {
+        if (data[month]) {
+          autoimport.push(data[month].autoimport_total);
+          wishlist.push(data[month].wishlist_total);
+          bgAuto.push('rgba(54, 162, 235, 0.6)');
+          bgWish.push('rgba(255, 99, 132, 0.6)');
+        } else {
+          autoimport.push(0);
+          wishlist.push(0);
+          bgAuto.push('rgba(200, 200, 200, 0.3)');
+          bgWish.push('rgba(180, 180, 180, 0.3)');
+        }
+      });
+
+      new Chart(document.getElementById('inquiryChart'), {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Autoimport Contacts',
+              data: autoimport,
+              backgroundColor: bgAuto
+            },
+            {
+              label: 'Wishlist Only',
+              data: wishlist,
+              backgroundColor: bgWish
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 1000 },
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
               }
-            });
-
-            new Chart(document.getElementById('inquiryChart'), {
-              type: 'bar',
-              data: {
-                labels: months,
-                datasets: [
-                  {
-                    label: 'Autoimport Contacts',
-                    data: autoimport,
-                    backgroundColor: bgAuto
-                  },
-                  {
-                    label: 'Wishlist Only',
-                    data: wishlist,
-                    backgroundColor: bgWish
-                  }
-                ]
-              },
-              options: {
-                responsive: true,
-                animation: { duration: 1000 },
-                plugins: {
-                  legend: { position: 'bottom' },
-                  tooltip: {
-                    callbacks: {
-                      label: ctx => ctx.raw === 0 ? 'No data yet' : `${ctx.dataset.label}: ${ctx.raw}`
-                    }
-                  }
-                }
-              }
-            });
-          });
-      </script>
+            },
+            // 🔢 Add values on top of bars
+            datalabels: {
+              anchor: 'end',
+              align: 'end',
+              color: '#333',
+              font: { weight: 'bold' },
+              formatter: value => value > 0 ? value : ''
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        },
+        plugins: [ChartDataLabels] // 👈 Activate plugin for labels
+      });
+    })
+    .catch(err => {
+      alert("Failed to load data: " + err.message);
+    });
+</script>
     </body>
     </html>
     """
