@@ -135,7 +135,7 @@
   "2025-07": {
     "autoimport_total": 102,
     "wishlist_total": 8,
-    "property_views": 89464,
+    "property_views": 89492,
     "sources": {
       "Subject: Kyero.com": 31,
       "Subject: Idealista": 34,
@@ -186,5 +186,107 @@
     "property_views": 0,
     "sources": {},
     "referrals": {}
-  }
+  },
+  "top_viewed_links": [
+    {
+      "ref": "R4770874",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4770874",
+      "views": 5912
+    },
+    {
+      "ref": "R4773037",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773037",
+      "views": 5080
+    },
+    {
+      "ref": "R4772782",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4772782",
+      "views": 4283
+    },
+    {
+      "ref": "R4773982",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773982",
+      "views": 4152
+    },
+    {
+      "ref": "R4796938",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4796938",
+      "views": 3651
+    },
+    {
+      "ref": "R4783069",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4783069",
+      "views": 3612
+    },
+    {
+      "ref": "R4926433",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4926433",
+      "views": 3462
+    },
+    {
+      "ref": "R4829677",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4829677",
+      "views": 3340
+    },
+    {
+      "ref": "R4881103",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4881103",
+      "views": 3176
+    },
+    {
+      "ref": "R4773838",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773838",
+      "views": 2993
+    },
+    {
+      "ref": "R4791274",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4791274",
+      "views": 2975
+    },
+    {
+      "ref": "R4774087",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4774087",
+      "views": 2860
+    },
+    {
+      "ref": "R4827703",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4827703",
+      "views": 2628
+    },
+    {
+      "ref": "R4827685",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4827685",
+      "views": 2545
+    },
+    {
+      "ref": "R4929529",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4929529",
+      "views": 2447
+    },
+    {
+      "ref": "R4791151",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4791151",
+      "views": 2423
+    },
+    {
+      "ref": "R4783087",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4783087",
+      "views": 2362
+    },
+    {
+      "ref": "R4797022",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4797022",
+      "views": 2273
+    },
+    {
+      "ref": "R4773514",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773514",
+      "views": 2263
+    },
+    {
+      "ref": "R4831231",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4831231",
+      "views": 2110
+    }
+  ]
 }
