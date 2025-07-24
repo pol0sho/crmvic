@@ -461,21 +461,6 @@ scales: {
         plugins: [ChartDataLabels] // 👈 Activate plugin for labels
       });
 
-      const topList = data.top_viewed_links || [];
-let listHtml = "<table style='width:100%; border-collapse:collapse;'>";
-listHtml += "<thead><tr><th style='text-align:left;'>Reference</th><th style='text-align:right;'>Views</th></tr></thead><tbody>";
-
-topList.forEach(entry => {
-  listHtml += `
-    <tr>
-      <td><a href="${entry.link}" target="_blank">${entry.ref}</a></td>
-      <td style="text-align:right;">${entry.views.toLocaleString()}</td>
-    </tr>
-  `;
-});
-
-listHtml += "</tbody></table>";
-document.getElementById("topViewedContainer").innerHTML = listHtml;
     })
     .catch(err => {
       alert("Failed to load data: " + err.message);
