@@ -279,7 +279,7 @@ max-height: 60vh;
       </style>
     </head>
     <body>
-      <h2>Inquiry Statistics - {{ year }}</h2>
+      <h2>AbraCasaBra Real Estate Statistics - {{ year }}</h2>
     <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries</h3>
       <canvas id="inquiryChart"></canvas>
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown</h3>
