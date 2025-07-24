@@ -260,10 +260,10 @@ max-height: 60vh;
       </style>
     </head>
     <body>
-      <h2>📊 Inquiry Statistics - {{ year }}</h2>
+      <h2>Inquiry Statistics - {{ year }}</h2>
       <canvas id="inquiryChart"></canvas>
-      <h3 style="text-align:center; margin-top:3rem;">📄 Monthly Breakdown</h3>
-<div id="sourceTable" style="overflow-x:auto; max-width: 1000px; margin: 2rem auto; font-family: monospace;"></div>
+      <h3 style="text-align:center; margin-top:3rem;"> Monthly Breakdown</h3>
+<div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
 
 
 <script>
