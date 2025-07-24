@@ -243,21 +243,21 @@ def inquiries_dashboard():
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Inquiry Statistics</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>Real Estate Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script>Chart.register(ChartDataLabels);</script>
 
   <style>
     :root {
-      --bg: #f8f8f5;
-      --card: #ffffff;
-      --text-main: #1f1f1f;
-      --text-muted: #6b7280;
-      --accent: #0069c0;
-      --highlight: #58a6ff;
-      --border: #e0e0e0;
+      --bg-dark: #111217;
+      --card: #1b1d25;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent-blue: #58a6ff;
+      --accent-purple: #a259ff;
+      --border: rgba(255, 255, 255, 0.08);
     }
 
     * {
@@ -267,37 +267,38 @@ def inquiries_dashboard():
     body {
       margin: 0;
       padding: 2rem;
-      background-color: var(--bg);
-      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
       color: var(--text-main);
+      font-family: 'Inter', sans-serif;
     }
 
     h2 {
       text-align: center;
-      font-family: 'Playfair Display', serif;
       font-size: 2.2rem;
-      color: var(--accent);
-      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: var(--accent-purple);
+      margin-bottom: 2rem;
     }
 
     h3 {
       text-align: center;
-      color: var(--text-muted);
+      color: var(--accent-blue);
       font-size: 1.2rem;
       margin-top: 3rem;
+      font-weight: 500;
     }
 
     canvas {
       width: 100%;
       max-width: 1200px;
-      max-height: 55vh;
+      max-height: 60vh;
       height: auto;
       display: block;
       margin: 2rem auto;
       background-color: var(--card);
       border-radius: 12px;
       padding: 1rem;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 0 40px rgba(162, 89, 255, 0.12);
     }
 
     table {
@@ -305,13 +306,12 @@ def inquiries_dashboard():
       width: 100%;
       max-width: 1200px;
       margin: 2rem auto;
-      font-size: 0.95rem;
-      font-family: 'Inter', sans-serif;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--card);
+      color: var(--text-main);
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
     th, td {
@@ -321,19 +321,19 @@ def inquiries_dashboard():
     }
 
     th {
-      background-color: #f0f2f5;
-      color: var(--accent);
-      font-weight: 600;
+      background-color: #24252e;
+      color: var(--accent-blue);
       text-transform: uppercase;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
     }
 
     tr:nth-child(even) {
-      background-color: #fafafa;
+      background-color: rgba(255, 255, 255, 0.03);
     }
 
     tr:hover {
-      background-color: #f3f7ff;
+      background-color: rgba(255, 255, 255, 0.05);
     }
 
     @media (max-width: 768px) {
