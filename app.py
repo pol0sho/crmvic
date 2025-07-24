@@ -243,9 +243,10 @@ def inquiries_dashboard():
 
 
 canvas {
-  max-width: 90vw;
-  max-height: 60vh;
+  width: 100%;
+  max-width: 1400px;
   height: auto;
+  aspect-ratio: 3 / 1; /* Keep it wide and short */
   display: block;
   margin: 2rem auto;
 }
