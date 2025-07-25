@@ -287,7 +287,8 @@ max-height: 60vh;
 
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
-
+<h3 style="text-align:center; margin-top:3rem;">Most viewed properties in locations</h3>
+<canvas id="locationsChart"></canvas>
 
 
 <script>
@@ -338,6 +339,47 @@ sources.forEach((src, i) => {
     stack: "sources"
   });
 });
+
+      const topLocations = data["top_viewed_locations"] || [];
+      if (topLocations.length > 0) {
+        const locationLabels = topLocations.map(loc => loc.name);
+        const locationViews = topLocations.map(loc => loc.views);
+
+        new Chart(document.getElementById('locationsChart'), {
+          type: 'bar',
+          data: {
+            labels: locationLabels,
+            datasets: [{
+              label: 'Views per Location',
+              data: locationViews,
+              backgroundColor: 'rgba(153, 102, 255, 0.7)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${ctx.raw} views`
+                }
+              },
+              datalabels: {
+                anchor: 'end',
+                align: 'end',
+                color: '#333',
+                font: { weight: 'bold' },
+                formatter: value => value > 0 ? value : ''
+              }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          },
+          plugins: [ChartDataLabels]
+        });
+      }
 
 new Chart(document.getElementById("sourceBreakdownChart"), {
   type: "bar",

@@ -60,14 +60,14 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
         # Fetch property refs
         properties = models.execute_kw(
             db, uid, password,
-            'estate.property', 'read',
+            'property.property', 'read',
             [top_property_ids],
-            {'fields': ['ref']}
+            {'fields': ['reference']}
         )
 
         links = []
         for prop in properties:
-            ref = prop.get('ref')
+            ref = prop.get('reference')
             if ref:
                 links.append({
                     "ref": ref,
@@ -117,6 +117,80 @@ def get_views_grouped_by_month(uid, models, db, password):
         print(f"❌ View count error: {e}")
 
     return month_counts
+
+def get_top_viewed_locations(uid, models, db, password, top_n=25):
+    """Aggregate property.view records by location_id and return the top N locations."""
+    view_counts_by_location = defaultdict(int)
+    batch_size = 5000
+    offset = 0
+
+    try:
+        # Get all property.view IDs
+        all_ids = models.execute_kw(
+            db, uid, password,
+            'property.view', 'search',
+            [[]],
+            {'order': 'date desc'}
+        )
+
+        # Process in batches
+        while offset < len(all_ids):
+            batch_ids = all_ids[offset:offset + batch_size]
+            views = models.execute_kw(
+                db, uid, password,
+                'property.view', 'read',
+                [batch_ids],
+                {'fields': ['property_id']}
+            )
+
+            # Collect property IDs in this batch
+            property_ids = [v['property_id'][0] for v in views if v.get('property_id')]
+            if property_ids:
+                # Read location_id for these properties
+                properties = models.execute_kw(
+                    db, uid, password,
+                    'property.property', 'read',
+                    [property_ids],
+                    {'fields': ['location_id']}
+                )
+                prop_location_map = {p['id']: p.get('location_id') for p in properties}
+
+                # Increment counters
+                for v in views:
+                    prop = v.get('property_id')
+                    if prop and isinstance(prop, list):
+                        loc = prop_location_map.get(prop[0])
+                        if loc and isinstance(loc, list):
+                            view_counts_by_location[loc[0]] += 1
+
+            offset += batch_size
+
+        # Sort by total views
+        top_locations = sorted(view_counts_by_location.items(),
+                               key=lambda x: x[1], reverse=True)[:top_n]
+        top_location_ids = [lid for lid, _ in top_locations]
+
+        # Get location names
+        locations = models.execute_kw(
+            db, uid, password,
+            'location.location', 'read',  # replace with the correct model name if different
+            [top_location_ids],
+            {'fields': ['name']}
+        )
+        loc_name_map = {loc['id']: loc['name'] for loc in locations}
+
+        result = []
+        for lid, views in top_locations:
+            result.append({
+                "location_id": lid,
+                "name": loc_name_map.get(lid, "Unknown"),
+                "views": views
+            })
+        return result
+
+    except Exception as e:
+        print(f"❌ Top viewed locations error: {e}")
+        return []
 
 def generate_inquiry_stats():
     uid, models, db, password = connect_to_odoo()
@@ -210,6 +284,10 @@ def generate_inquiry_stats():
 
     top_links = get_top_viewed_property_links(uid, models, db, password)
     results["top_viewed_links"] = top_links
+
+    top_locations = get_top_viewed_locations(uid, models, db, password)
+
+    results["top_viewed_locations"] = top_locations
 
     with open("inquiry_stats.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
