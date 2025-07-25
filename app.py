@@ -319,7 +319,18 @@ const datasets = [];
 
 // Add per-source stacks
 sources.forEach((src, i) => {
-  const color = `hsl(${(i * 60) % 360}, 60%, 60%)`;
+  let color;
+  const cleanLabel = src.replace("Subject: ", "").toLowerCase();
+
+  if (cleanLabel.includes("pisos.com")) {
+    color = "rgba(255, 159, 64, 0.8)"; // orange for pisos.com
+  } else if (cleanLabel.includes("kyero")) {
+    color = "rgba(255, 99, 132, 0.8)"; // reddish for kyero
+  } else {
+    // fallback to auto HSL colors for other sources
+    color = `hsl(${(i * 60) % 360}, 60%, 60%)`;
+  }
+
   datasets.push({
     label: src.replace("Subject: ", ""),
     data: months.map(m => data[m]?.sources?.[src] || 0),
