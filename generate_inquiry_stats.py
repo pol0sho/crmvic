@@ -27,11 +27,15 @@ def get_all_months_this_year():
 
 
 def get_top_viewed_property_links(uid, models, db, password, top_n=20):
+    """
+    Get the most viewed properties of all time, ensuring that only existing and active properties are included.
+    """
     view_counts = defaultdict(int)
     batch_size = 5000
     offset = 0
 
     try:
+        # Get all property.view records
         all_ids = models.execute_kw(
             db, uid, password,
             'property.view', 'search',
@@ -39,6 +43,7 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
             {'order': 'date desc'}
         )
 
+        # Count views per property
         while offset < len(all_ids):
             batch_ids = all_ids[offset:offset + batch_size]
             records = models.execute_kw(
@@ -53,27 +58,37 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
                     view_counts[prop[0]] += 1
             offset += batch_size
 
-        # Get top N property IDs
-        top_ids = sorted(view_counts.items(), key=lambda x: x[1], reverse=True)[:top_n]
+        # Sort by views
+        top_ids = sorted(view_counts.items(), key=lambda x: x[1], reverse=True)[:top_n * 2]  # extra buffer
         top_property_ids = [pid for pid, _ in top_ids]
 
-        # Fetch property refs
+        # Read properties – only existing ones will be returned
         properties = models.execute_kw(
             db, uid, password,
             'property.property', 'read',
             [top_property_ids],
-            {'fields': ['reference']}
+            {'fields': ['reference', 'active']}
         )
 
+        existing_ids = {p['id']: p for p in properties}
+
         links = []
-        for prop in properties:
+        for prop_id, count in top_ids:
+            prop = existing_ids.get(prop_id)
+            if not prop:
+                continue  # skip missing property
+            # If active field exists and is False, skip it
+            if 'active' in prop and not prop['active']:
+                continue
             ref = prop.get('reference')
             if ref:
                 links.append({
                     "ref": ref,
                     "link": f"https://abracasabra-realestate.com/property/?ref_no={ref}",
-                    "views": view_counts[prop['id']]
+                    "views": count
                 })
+            if len(links) >= top_n:
+                break  # limit results to top_n
 
         return links
 
@@ -173,7 +188,7 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
         # Get location names
         locations = models.execute_kw(
             db, uid, password,
-            'location.location', 'read',  # replace with the correct model name if different
+            'res.location', 'read',  # replace with the correct model name if different
             [top_location_ids],
             {'fields': ['name']}
         )

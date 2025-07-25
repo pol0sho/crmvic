@@ -287,8 +287,11 @@ max-height: 60vh;
 
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
-<h3 style="text-align:center; margin-top:3rem;">Most viewed properties in locations</h3>
+<h3 style="text-align:center; margin-top:3rem;">Most Viewed Locations Of All Time (Property Pages)</h3>
 <canvas id="locationsChart"></canvas>
+
+<h3 style="text-align:center; margin-top:3rem;">Most Viewed Properties Of All Time</h3>
+<div id="topProperties" style="max-width: 900px; margin: 2rem auto; font-family: monospace;"></div>
 
 
 <script>
@@ -380,6 +383,23 @@ sources.forEach((src, i) => {
           plugins: [ChartDataLabels]
         });
       }
+
+const topProps = data["top_viewed_links"] || [];
+if (topProps.length > 0) {
+  let html = "<table style='border-collapse:collapse; width:100%;'>";
+  html += "<thead><tr><th style='text-align:left;padding:8px;'>Reference</th><th style='padding:8px;'>Views</th><th style='padding:8px;'>Link</th></tr></thead><tbody>";
+  topProps.forEach(p => {
+    html += `<tr>
+               <td style='padding:8px;'>${p.ref}</td>
+               <td style='padding:8px;text-align:center;'>${p.views}</td>
+               <td style='padding:8px;text-align:center;'>
+                 <a href="${p.link}" target="_blank">View</a>
+               </td>
+             </tr>`;
+  });
+  html += "</tbody></table>";
+  document.getElementById("topProperties").innerHTML = html;
+}
 
 new Chart(document.getElementById("sourceBreakdownChart"), {
   type: "bar",

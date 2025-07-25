@@ -135,7 +135,7 @@
   "2025-07": {
     "autoimport_total": 103,
     "wishlist_total": 8,
-    "property_views": 90607,
+    "property_views": 90770,
     "sources": {
       "Subject: Kyero.com": 31,
       "Subject: Idealista": 35,
@@ -194,54 +194,19 @@
       "views": 5913
     },
     {
-      "ref": "R4773037",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773037",
-      "views": 5080
-    },
-    {
-      "ref": "R4772782",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4772782",
-      "views": 4283
-    },
-    {
-      "ref": "R4773982",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773982",
-      "views": 4152
-    },
-    {
-      "ref": "R4796938",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4796938",
-      "views": 3651
-    },
-    {
-      "ref": "R4783069",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4783069",
-      "views": 3612
-    },
-    {
       "ref": "R4926433",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4926433",
       "views": 3463
     },
     {
-      "ref": "R4829677",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4829677",
-      "views": 3340
-    },
-    {
       "ref": "R4881103",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4881103",
-      "views": 3180
+      "views": 3181
     },
     {
       "ref": "R4773838",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4773838",
       "views": 3002
-    },
-    {
-      "ref": "R4791274",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4791274",
-      "views": 2975
     },
     {
       "ref": "R4774087",
@@ -254,56 +219,81 @@
       "views": 2629
     },
     {
-      "ref": "R4827685",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4827685",
-      "views": 2545
-    },
-    {
-      "ref": "R4929529",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4929529",
-      "views": 2447
-    },
-    {
-      "ref": "R4791151",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4791151",
-      "views": 2423
-    },
-    {
       "ref": "R4783087",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4783087",
       "views": 2363
     },
     {
-      "ref": "R4797022",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4797022",
-      "views": 2273
+      "ref": "R4773808",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773808",
+      "views": 1982
     },
     {
-      "ref": "R4773514",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773514",
-      "views": 2263
+      "ref": "R4774111",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4774111",
+      "views": 1824
     },
     {
-      "ref": "R4831231",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4831231",
-      "views": 2110
+      "ref": "R4773409",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4773409",
+      "views": 1737
+    },
+    {
+      "ref": "R4790062",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4790062",
+      "views": 1703
+    },
+    {
+      "ref": "R4867687",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4867687",
+      "views": 1571
+    },
+    {
+      "ref": "R4597255",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4597255",
+      "views": 1540
+    },
+    {
+      "ref": "R4334497",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4334497",
+      "views": 1491
+    },
+    {
+      "ref": "R4821979",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4821979",
+      "views": 1432
+    },
+    {
+      "ref": "R5010418",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R5010418",
+      "views": 1430
+    },
+    {
+      "ref": "R4774069",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4774069",
+      "views": 1413
+    },
+    {
+      "ref": "R4944028",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4944028",
+      "views": 1379
     }
   ],
   "top_viewed_locations": [
     {
       "location_id": 63,
       "name": "Canillas de Aceituno",
-      "views": 55052
+      "views": 55068
     },
     {
       "location_id": 188,
       "name": "Estepona (town)",
-      "views": 36832
+      "views": 36852
     },
     {
       "location_id": 654,
       "name": "Torrevieja",
-      "views": 34781
+      "views": 34788
     },
     {
       "location_id": 324,
@@ -318,32 +308,32 @@
     {
       "location_id": 214,
       "name": "Marbella (town)",
-      "views": 26913
+      "views": 26944
     },
     {
       "location_id": 295,
       "name": "Mijas",
-      "views": 25946
+      "views": 25954
     },
     {
       "location_id": 57,
       "name": "Arenas",
-      "views": 24607
+      "views": 24608
     },
     {
       "location_id": 212,
       "name": "Fuengirola (town)",
-      "views": 24529
+      "views": 24530
     },
     {
       "location_id": 226,
       "name": "Almog\u00eda",
-      "views": 16742
+      "views": 16744
     },
     {
       "location_id": 224,
       "name": "Alhaur\u00edn el Grande",
-      "views": 15192
+      "views": 15194
     },
     {
       "location_id": 276,
@@ -353,17 +343,17 @@
     {
       "location_id": 36,
       "name": "C\u00f3mpeta",
-      "views": 14057
+      "views": 14059
     },
     {
       "location_id": 289,
       "name": "Nueva Andaluc\u00eda",
-      "views": 13982
+      "views": 13997
     },
     {
       "location_id": 187,
       "name": "Benahav\u00eds (town)",
-      "views": 13623
+      "views": 13632
     },
     {
       "location_id": 186,
@@ -378,7 +368,7 @@
     {
       "location_id": 45,
       "name": "Alcauc\u00edn",
-      "views": 10584
+      "views": 10586
     },
     {
       "location_id": 270,
@@ -388,7 +378,7 @@
     {
       "location_id": 207,
       "name": "Mijas Costa",
-      "views": 10179
+      "views": 10181
     },
     {
       "location_id": 26,
@@ -403,12 +393,12 @@
     {
       "location_id": 209,
       "name": "La Cala",
-      "views": 9606
+      "views": 9614
     },
     {
       "location_id": 228,
       "name": "Alora",
-      "views": 9427
+      "views": 9428
     },
     {
       "location_id": 184,
