@@ -133,12 +133,12 @@
     }
   },
   "2025-07": {
-    "autoimport_total": 102,
+    "autoimport_total": 103,
     "wishlist_total": 8,
-    "property_views": 89492,
+    "property_views": 90607,
     "sources": {
       "Subject: Kyero.com": 31,
-      "Subject: Idealista": 34,
+      "Subject: Idealista": 35,
       "Subject: Indomio": 5,
       "Subject: AbraCasaBra Form": 23,
       "Subject: thinkSPAIN": 15,
@@ -191,7 +191,7 @@
     {
       "ref": "R4770874",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4770874",
-      "views": 5912
+      "views": 5913
     },
     {
       "ref": "R4773037",
@@ -221,7 +221,7 @@
     {
       "ref": "R4926433",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4926433",
-      "views": 3462
+      "views": 3463
     },
     {
       "ref": "R4829677",
@@ -231,12 +231,12 @@
     {
       "ref": "R4881103",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4881103",
-      "views": 3176
+      "views": 3180
     },
     {
       "ref": "R4773838",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4773838",
-      "views": 2993
+      "views": 3002
     },
     {
       "ref": "R4791274",
@@ -246,12 +246,12 @@
     {
       "ref": "R4774087",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4774087",
-      "views": 2860
+      "views": 2861
     },
     {
       "ref": "R4827703",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4827703",
-      "views": 2628
+      "views": 2629
     },
     {
       "ref": "R4827685",
@@ -271,7 +271,7 @@
     {
       "ref": "R4783087",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4783087",
-      "views": 2362
+      "views": 2363
     },
     {
       "ref": "R4797022",
@@ -287,6 +287,133 @@
       "ref": "R4831231",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4831231",
       "views": 2110
+    }
+  ],
+  "top_viewed_locations": [
+    {
+      "location_id": 63,
+      "name": "Canillas de Aceituno",
+      "views": 55052
+    },
+    {
+      "location_id": 188,
+      "name": "Estepona (town)",
+      "views": 36832
+    },
+    {
+      "location_id": 654,
+      "name": "Torrevieja",
+      "views": 34781
+    },
+    {
+      "location_id": 324,
+      "name": "Comares",
+      "views": 31297
+    },
+    {
+      "location_id": 543,
+      "name": "Orihuela Costa",
+      "views": 30378
+    },
+    {
+      "location_id": 214,
+      "name": "Marbella (town)",
+      "views": 26913
+    },
+    {
+      "location_id": 295,
+      "name": "Mijas",
+      "views": 25946
+    },
+    {
+      "location_id": 57,
+      "name": "Arenas",
+      "views": 24607
+    },
+    {
+      "location_id": 212,
+      "name": "Fuengirola (town)",
+      "views": 24529
+    },
+    {
+      "location_id": 226,
+      "name": "Almog\u00eda",
+      "views": 16742
+    },
+    {
+      "location_id": 224,
+      "name": "Alhaur\u00edn el Grande",
+      "views": 15192
+    },
+    {
+      "location_id": 276,
+      "name": "M\u00e1laga (town)",
+      "views": 14667
+    },
+    {
+      "location_id": 36,
+      "name": "C\u00f3mpeta",
+      "views": 14057
+    },
+    {
+      "location_id": 289,
+      "name": "Nueva Andaluc\u00eda",
+      "views": 13982
+    },
+    {
+      "location_id": 187,
+      "name": "Benahav\u00eds (town)",
+      "views": 13623
+    },
+    {
+      "location_id": 186,
+      "name": "Benalm\u00e1dena (town)",
+      "views": 13078
+    },
+    {
+      "location_id": 544,
+      "name": "Pilar de la Horadada",
+      "views": 12855
+    },
+    {
+      "location_id": 45,
+      "name": "Alcauc\u00edn",
+      "views": 10584
+    },
+    {
+      "location_id": 270,
+      "name": "Co\u00edn",
+      "views": 10418
+    },
+    {
+      "location_id": 207,
+      "name": "Mijas Costa",
+      "views": 10179
+    },
+    {
+      "location_id": 26,
+      "name": "Riogordo",
+      "views": 9975
+    },
+    {
+      "location_id": 539,
+      "name": "Ciudad Quesada",
+      "views": 9731
+    },
+    {
+      "location_id": 209,
+      "name": "La Cala",
+      "views": 9606
+    },
+    {
+      "location_id": 228,
+      "name": "Alora",
+      "views": 9427
+    },
+    {
+      "location_id": 184,
+      "name": "Nerja",
+      "views": 8941
     }
   ]
 }
