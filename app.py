@@ -322,6 +322,9 @@ max-height: 60vh;
 <h3 style="text-align:center; margin-top:3rem;">Most Viewed Locations Of All Time (Property Pages)</h3>
 <canvas id="locationsChart"></canvas>
 
+<h3 style="text-align:center; margin-top:3rem;">Top Viewer Countries</h3>
+<canvas id="countriesChart"></canvas>
+
 <h3 style="text-align:center; margin-top:3rem;">Most Viewed Properties Of All Time</h3>
 <div id="topPropertiesContainer" style="overflow-x:auto; max-width:1400px; margin:2rem auto;"></div>
 
@@ -416,6 +419,41 @@ sources.forEach((src, i) => {
           plugins: [ChartDataLabels]
         });
       }
+
+
+const topCountries = data["top_viewer_countries"] || [];
+if (topCountries.length > 0) {
+  const countryLabels = topCountries.map(c => c.country);
+  const countryViews = topCountries.map(c => c.views);
+
+  new Chart(document.getElementById('countriesChart'), {
+    type: 'bar',
+    data: {
+      labels: countryLabels,
+      datasets: [{
+        label: 'Views by Country',
+        data: countryViews,
+        backgroundColor: 'rgba(75, 192, 192, 0.7)'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#333',
+          font: { weight: 'bold' },
+          formatter: value => value > 0 ? value : ''
+        }
+      },
+      scales: { y: { beginAtZero: true } }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
 
 const topProperties = data["top_viewed_links"] || [];
 if (topProperties.length > 0) {

@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import json
+import geoip2.database
 
 def connect_to_odoo():
     url = "https://crm.abracasabra.es"
@@ -207,6 +208,64 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
         print(f"❌ Top viewed locations error: {e}")
         return []
 
+
+# Initialize the GeoLite2 reader once
+reader = geoip2.database.Reader('GeoLite2-Country.mmdb')
+
+def geolocate_ip(ip):
+    try:
+        response = reader.country(ip)
+        return response.country.name
+    except Exception:
+        return None
+
+def get_top_countries(uid, models, db, password, top_n=20):
+    batch_size = 5000
+    offset = 0
+    country_counts = defaultdict(int)
+    seen_ips = {}
+
+    all_ids = models.execute_kw(
+        db, uid, password,
+        'property.view', 'search',
+        [[]],
+        {'order': 'date desc'}
+    )
+
+    while offset < len(all_ids):
+        batch_ids = all_ids[offset:offset + batch_size]
+        views = models.execute_kw(
+            db, uid, password,
+            'property.view', 'read',
+            [batch_ids],
+            {'fields': ['ip', 'user_agent']}
+        )
+
+        for v in views:
+            ua = (v.get('user_agent') or '').lower()
+            # skip known bots
+            if 'gptbot' in ua or 'claudebot' in ua or 'spider' in ua:
+                continue
+
+            ip = v.get('ip')
+            if not ip:
+                continue
+            if ip in seen_ips:
+                country = seen_ips[ip]
+            else:
+                country = geolocate_ip(ip)
+                seen_ips[ip] = country
+
+            if country:
+                country_counts[country] += 1
+
+        offset += batch_size
+
+    top_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)[:top_n]
+    return [{"country": c, "views": v} for c, v in top_countries]
+
+
+
 def generate_inquiry_stats():
     uid, models, db, password = connect_to_odoo()
     if not uid:
@@ -303,6 +362,9 @@ def generate_inquiry_stats():
     top_locations = get_top_viewed_locations(uid, models, db, password)
 
     results["top_viewed_locations"] = top_locations
+
+    top_countries = get_top_countries(uid, models, db, password)
+    results["top_viewer_countries"] = top_countries
 
     with open("inquiry_stats.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)

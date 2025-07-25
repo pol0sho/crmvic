@@ -135,7 +135,7 @@
   "2025-07": {
     "autoimport_total": 103,
     "wishlist_total": 8,
-    "property_views": 90770,
+    "property_views": 90818,
     "sources": {
       "Subject: Kyero.com": 31,
       "Subject: Idealista": 35,
@@ -191,27 +191,27 @@
     {
       "ref": "R4770874",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4770874",
-      "views": 5913
+      "views": 5915
     },
     {
       "ref": "R4926433",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4926433",
-      "views": 3463
+      "views": 3464
     },
     {
       "ref": "R4881103",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4881103",
-      "views": 3181
+      "views": 3182
     },
     {
       "ref": "R4773838",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4773838",
-      "views": 3002
+      "views": 3003
     },
     {
       "ref": "R4774087",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4774087",
-      "views": 2861
+      "views": 2862
     },
     {
       "ref": "R4827703",
@@ -241,7 +241,7 @@
     {
       "ref": "R4790062",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4790062",
-      "views": 1703
+      "views": 1704
     },
     {
       "ref": "R4867687",
@@ -283,12 +283,12 @@
     {
       "location_id": 63,
       "name": "Canillas de Aceituno",
-      "views": 55068
+      "views": 55073
     },
     {
       "location_id": 188,
       "name": "Estepona (town)",
-      "views": 36852
+      "views": 36854
     },
     {
       "location_id": 654,
@@ -298,7 +298,7 @@
     {
       "location_id": 324,
       "name": "Comares",
-      "views": 31297
+      "views": 31300
     },
     {
       "location_id": 543,
@@ -308,7 +308,7 @@
     {
       "location_id": 214,
       "name": "Marbella (town)",
-      "views": 26944
+      "views": 26946
     },
     {
       "location_id": 295,
@@ -343,7 +343,7 @@
     {
       "location_id": 36,
       "name": "C\u00f3mpeta",
-      "views": 14059
+      "views": 14061
     },
     {
       "location_id": 289,
@@ -353,12 +353,12 @@
     {
       "location_id": 187,
       "name": "Benahav\u00eds (town)",
-      "views": 13632
+      "views": 13633
     },
     {
       "location_id": 186,
       "name": "Benalm\u00e1dena (town)",
-      "views": 13078
+      "views": 13079
     },
     {
       "location_id": 544,
@@ -378,7 +378,7 @@
     {
       "location_id": 207,
       "name": "Mijas Costa",
-      "views": 10181
+      "views": 10182
     },
     {
       "location_id": 26,
@@ -398,12 +398,94 @@
     {
       "location_id": 228,
       "name": "Alora",
-      "views": 9428
+      "views": 9429
     },
     {
       "location_id": 184,
       "name": "Nerja",
       "views": 8941
+    }
+  ],
+  "top_viewer_countries": [
+    {
+      "country": "Spain",
+      "views": 103802
+    },
+    {
+      "country": "The Netherlands",
+      "views": 56300
+    },
+    {
+      "country": "Belgium",
+      "views": 33343
+    },
+    {
+      "country": "United Kingdom",
+      "views": 17286
+    },
+    {
+      "country": "Germany",
+      "views": 8323
+    },
+    {
+      "country": "United States",
+      "views": 7279
+    },
+    {
+      "country": "France",
+      "views": 4773
+    },
+    {
+      "country": "Ireland",
+      "views": 3182
+    },
+    {
+      "country": "Singapore",
+      "views": 2743
+    },
+    {
+      "country": "Sweden",
+      "views": 2407
+    },
+    {
+      "country": "Canada",
+      "views": 2228
+    },
+    {
+      "country": "Ukraine",
+      "views": 2209
+    },
+    {
+      "country": "Denmark",
+      "views": 2177
+    },
+    {
+      "country": "Switzerland",
+      "views": 1550
+    },
+    {
+      "country": "Israel",
+      "views": 1236
+    },
+    {
+      "country": "Poland",
+      "views": 1169
+    },
+    {
+      "country": "Hungary",
+      "views": 758
+    },
+    {
+      "country": "Portugal",
+      "views": 564
+    },
+    {
+      "country": "Czechia",
+      "views": 499
+    },
+    {
+      "country": "Australia",
+      "views": 472
     }
   ]
 }

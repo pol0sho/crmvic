@@ -1,3 +1,4 @@
 Flask==2.3.3
 psycopg==3.1.18
 python-dateutil
+geoip2
