@@ -267,6 +267,38 @@ thead {
   background: #f1f5f9;
 }
 
+.top-properties-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.top-properties-table th, .top-properties-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.top-properties-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.top-properties-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.top-properties-table a {
+  color: #2563EB;
+  text-decoration: none;
+  font-weight: 500;
+}
+.top-properties-table a:hover {
+  text-decoration: underline;
+}
+
 canvas {
   width: 100%;
   max-width: 1400px;
@@ -291,7 +323,8 @@ max-height: 60vh;
 <canvas id="locationsChart"></canvas>
 
 <h3 style="text-align:center; margin-top:3rem;">Most Viewed Properties Of All Time</h3>
-<div id="topProperties" style="max-width: 900px; margin: 2rem auto; font-family: monospace;"></div>
+<div id="topPropertiesContainer" style="overflow-x:auto; max-width:1400px; margin:2rem auto;"></div>
+
 
 
 <script>
@@ -384,21 +417,20 @@ sources.forEach((src, i) => {
         });
       }
 
-const topProps = data["top_viewed_links"] || [];
-if (topProps.length > 0) {
-  let html = "<table style='border-collapse:collapse; width:100%;'>";
-  html += "<thead><tr><th style='text-align:left;padding:8px;'>Reference</th><th style='padding:8px;'>Views</th><th style='padding:8px;'>Link</th></tr></thead><tbody>";
-  topProps.forEach(p => {
+const topProperties = data["top_viewed_links"] || [];
+if (topProperties.length > 0) {
+  let html = "<table class='top-properties-table'>";
+  html += "<thead><tr><th>Rank</th><th>Reference</th><th>Views</th><th>Link</th></tr></thead><tbody>";
+  topProperties.forEach((p, idx) => {
     html += `<tr>
-               <td style='padding:8px;'>${p.ref}</td>
-               <td style='padding:8px;text-align:center;'>${p.views}</td>
-               <td style='padding:8px;text-align:center;'>
-                 <a href="${p.link}" target="_blank">View</a>
-               </td>
-             </tr>`;
+      <td>${idx + 1}</td>
+      <td>${p.ref}</td>
+      <td>${p.views}</td>
+      <td><a href="${p.link}" target="_blank">View</a></td>
+    </tr>`;
   });
   html += "</tbody></table>";
-  document.getElementById("topProperties").innerHTML = html;
+  document.getElementById("topPropertiesContainer").innerHTML = html;
 }
 
 new Chart(document.getElementById("sourceBreakdownChart"), {
