@@ -283,7 +283,8 @@ max-height: 60vh;
     <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries</h3>
       <canvas id="inquiryChart"></canvas>
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown</h3>
-<div id="sourceTable" style="overflow-x:auto; max-width: 1400px; margin: 2rem auto; font-family: monospace;"></div>
+<canvas id="sourceBreakdownChart"></canvas>
+
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
 
@@ -304,42 +305,66 @@ max-height: 60vh;
       const bgAuto = [];
       const bgWish = [];
 
-      let tableHtml = "<table style='border-collapse:collapse; width:100%;'>";
-tableHtml += "<thead><tr><th style='text-align:left;'>Month</th><th>Autoimport</th><th>Wishlist</th>";
-
+      // instead of building table HTML
+// Collect unique sources
 const sourceSet = new Set();
-
-// First pass: collect all sources
-for (const month of months) {
-  if (data[month]) {
-    Object.keys(data[month].sources || {}).forEach(source => sourceSet.add(source));
-  }
-}
-const sources = Array.from(sourceSet);
-sources.forEach(source => {
-  tableHtml += `<th>${source.replace("Subject: ", "")}</th>`;
-});
-tableHtml += "</tr></thead><tbody>";
-
-// Second pass: build rows
 months.forEach(month => {
-  const entry = data[month];
-  tableHtml += `<tr><td>${month}</td>`;
-  if (entry) {
-    tableHtml += `<td style='text-align:center;'>${entry.autoimport_total}</td>`;
-    tableHtml += `<td style='text-align:center;'>${entry.wishlist_total}</td>`;
-    sources.forEach(source => {
-      const val = entry.sources?.[source] || 0;
-      tableHtml += `<td style='text-align:center;'>${val}</td>`;
-    });
-  } else {
-    tableHtml += `<td colspan="${2 + sources.length}" style='text-align:center; color:#aaa;'>No data</td>`;
+  if (data[month]) {
+    Object.keys(data[month].sources || {}).forEach(src => sourceSet.add(src));
   }
-  tableHtml += "</tr>";
+});
+const sources = Array.from(sourceSet);
+
+const datasets = [];
+
+// Autoimport & Wishlist datasets
+datasets.push({
+  label: "Autoimport",
+  data: months.map(m => data[m]?.autoimport_total || 0),
+  backgroundColor: "rgba(54, 162, 235, 0.7)",
+  stack: "totals"
+});
+datasets.push({
+  label: "Wishlist",
+  data: months.map(m => data[m]?.wishlist_total || 0),
+  backgroundColor: "rgba(255, 99, 132, 0.7)",
+  stack: "totals"
 });
 
-tableHtml += "</tbody></table>";
-document.getElementById("sourceTable").innerHTML = tableHtml;
+// Add per-source stacks
+sources.forEach((src, i) => {
+  const color = `hsl(${(i * 60) % 360}, 60%, 60%)`;
+  datasets.push({
+    label: src.replace("Subject: ", ""),
+    data: months.map(m => data[m]?.sources?.[src] || 0),
+    backgroundColor: color,
+    stack: "sources"
+  });
+});
+
+new Chart(document.getElementById("sourceBreakdownChart"), {
+  type: "bar",
+  data: { labels: months, datasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: { mode: "index", intersect: false },
+      legend: { position: "top" },
+      datalabels: {
+        color: "#333",
+        font: { weight: "bold" },
+        formatter: v => v > 0 ? v : ""
+      }
+    },
+    scales: {
+      x: { stacked: true },
+      y: { stacked: true, beginAtZero: true }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
 
       months.forEach(month => {
         if (data[month]) {
