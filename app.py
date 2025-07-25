@@ -280,9 +280,9 @@ max-height: 60vh;
     </head>
     <body>
       <h2>AbraCasaBra Real Estate Statistics - {{ year }}</h2>
-    <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries</h3>
+    <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries & Wishlists</h3>
       <canvas id="inquiryChart"></canvas>
-      <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown</h3>
+      <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown Per Portal</h3>
 <canvas id="sourceBreakdownChart"></canvas>
 
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
@@ -316,20 +316,6 @@ months.forEach(month => {
 const sources = Array.from(sourceSet);
 
 const datasets = [];
-
-// Autoimport & Wishlist datasets
-datasets.push({
-  label: "Autoimport",
-  data: months.map(m => data[m]?.autoimport_total || 0),
-  backgroundColor: "rgba(54, 162, 235, 0.7)",
-  stack: "totals"
-});
-datasets.push({
-  label: "Wishlist",
-  data: months.map(m => data[m]?.wishlist_total || 0),
-  backgroundColor: "rgba(255, 99, 132, 0.7)",
-  stack: "totals"
-});
 
 // Add per-source stacks
 sources.forEach((src, i) => {
