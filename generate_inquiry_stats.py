@@ -264,7 +264,69 @@ def get_top_countries(uid, models, db, password, top_n=20):
     top_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)[:top_n]
     return [{"country": c, "views": v} for c, v in top_countries]
 
+def get_views_by_price_range(uid, models, db, password):
+    """
+    Calculate total views for properties grouped by price ranges.
+    """
+    # Step 1: Gather all property views
+    view_counts = defaultdict(int)
+    batch_size = 5000
+    offset = 0
 
+    all_ids = models.execute_kw(
+        db, uid, password,
+        'property.view', 'search',
+        [[]],
+        {'order': 'date desc'}
+    )
+
+    while offset < len(all_ids):
+        batch_ids = all_ids[offset:offset + batch_size]
+        views = models.execute_kw(
+            db, uid, password,
+            'property.view', 'read',
+            [batch_ids],
+            {'fields': ['property_id']}
+        )
+
+        for v in views:
+            prop = v.get('property_id')
+            if prop and isinstance(prop, list):
+                view_counts[prop[0]] += 1
+
+        offset += batch_size
+
+    if not view_counts:
+        return {}
+
+
+    property_ids = list(view_counts.keys())
+    properties = models.execute_kw(
+        db, uid, password,
+        'property.property', 'read',
+        [property_ids],
+        {'fields': ['list_price']}
+    )
+
+    # Step 3: Define price bins
+    bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 50)]  # up to 5M
+    price_ranges = {f"{low}-{high}": 0 for (low, high) in bins}
+
+    # Step 4: Aggregate
+    for prop in properties:
+        price = prop.get('list_price') or 0
+        views = view_counts.get(prop['id'], 0)
+
+        for low, high in bins:
+            if low <= price < high:
+                key = f"{low}-{high}"
+                price_ranges[key] += views
+                break
+
+    # Remove empty bins (optional)
+    price_ranges = {k: v for k, v in price_ranges.items() if v > 0}
+
+    return price_ranges
 
 def generate_inquiry_stats():
     uid, models, db, password = connect_to_odoo()
@@ -365,6 +427,9 @@ def generate_inquiry_stats():
 
     top_countries = get_top_countries(uid, models, db, password)
     results["top_viewer_countries"] = top_countries
+
+    views_by_price_range = get_views_by_price_range(uid, models, db, password)
+    results["views_by_price_range"] = views_by_price_range
 
     with open("inquiry_stats.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)

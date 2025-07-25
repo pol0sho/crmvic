@@ -325,6 +325,9 @@ max-height: 60vh;
 <h3 style="text-align:center; margin-top:3rem;">Top Viewer Countries</h3>
 <canvas id="countriesChart"></canvas>
 
+<h3 style="text-align:center; margin-top:3rem;">Views by Price Range</h3>
+<canvas id="priceRangeChart"></canvas>
+
 <h3 style="text-align:center; margin-top:3rem;">Most Viewed Properties Of All Time</h3>
 <div id="topPropertiesContainer" style="overflow-x:auto; max-width:1400px; margin:2rem auto;"></div>
 
@@ -419,6 +422,60 @@ sources.forEach((src, i) => {
           plugins: [ChartDataLabels]
         });
       }
+
+
+// === Price Range Views Chart ===
+const priceRangeData = data["views_by_price_range"] || {};
+if (Object.keys(priceRangeData).length > 0) {
+  const labels = Object.keys(priceRangeData);
+  const values = Object.values(priceRangeData);
+
+  new Chart(document.getElementById("priceRangeChart"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Total Views",
+        data: values,
+        backgroundColor: "rgba(255, 205, 86, 0.7)"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.raw} views`
+          }
+        },
+        datalabels: {
+          anchor: "end",
+          align: "end",
+          color: "#333",
+          font: { weight: "bold" },
+          formatter: value => value > 0 ? value : ""
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            callback: function(value, index) {
+              // Show range in millions/k for clarity
+              const range = labels[index].split("-");
+              const low = parseInt(range[0]);
+              const high = parseInt(range[1]);
+              return `${(low/1000)}k-${(high/1000)}k`;
+            }
+          }
+        },
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+} 
 
 
 const topCountries = data["top_viewer_countries"] || [];
