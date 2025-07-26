@@ -613,11 +613,10 @@ const viewsData = trimmedMonths.map(month => data[month]?.property_views || 0);
           },
 scales: {
   y: {
-    min: 30000,  // 🔽 Set lower limit
-    suggestedMax: Math.max(...viewsData) + 5000, // ⬆️ Dynamic upper buffer
+    beginAtZero: true,
+    suggestedMax: Math.max(...viewsData) + 5000,
     ticks: {
-      callback: (value) => value.toLocaleString(), // Optional: comma format
-      stepSize: 5000
+      callback: (value) => value.toLocaleString()
     }
   }
 }
