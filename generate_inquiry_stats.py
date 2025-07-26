@@ -5,6 +5,10 @@ from dateutil.relativedelta import relativedelta
 import json
 import geoip2.database
 
+# ====================
+# HELPER FUNCTIONS
+# ====================
+
 def connect_to_odoo():
     url = "https://crm.abracasabra.es"
     db = "crm.abracasabra.es"
@@ -22,10 +26,21 @@ def connect_to_odoo():
         print(f"❌ Odoo Connection Error: {e}")
         return None, None, None, None
 
+
 def get_all_months_this_year():
     now = datetime.now()
     return [f"{now.year}-{month:02d}" for month in range(1, 13)]
 
+
+def is_bot(view):
+    """Return True if user_agent indicates a bot."""
+    ua = (view.get('user_agent') or '').lower()
+    return any(bot in ua for bot in ['gptbot', 'claudebot', 'spider'])
+
+
+# ====================
+# STATS FUNCTIONS
+# ====================
 
 def get_top_viewed_property_links(uid, models, db, password, top_n=20):
     """
@@ -36,7 +51,6 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
     offset = 0
 
     try:
-        # Get all property.view records
         all_ids = models.execute_kw(
             db, uid, password,
             'property.view', 'search',
@@ -44,26 +58,27 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
             {'order': 'date desc'}
         )
 
-        # Count views per property
         while offset < len(all_ids):
             batch_ids = all_ids[offset:offset + batch_size]
             records = models.execute_kw(
                 db, uid, password,
                 'property.view', 'read',
                 [batch_ids],
-                {'fields': ['property_id']}
+                {'fields': ['property_id', 'user_agent']}
             )
-            for view in records:
-                prop = view.get('property_id')
+            for v in records:
+                if is_bot(v):
+                    continue
+                prop = v.get('property_id')
                 if prop and isinstance(prop, list):
                     view_counts[prop[0]] += 1
             offset += batch_size
 
-        # Sort by views
-        top_ids = sorted(view_counts.items(), key=lambda x: x[1], reverse=True)[:top_n * 2]  # extra buffer
+        # sort by views
+        top_ids = sorted(view_counts.items(), key=lambda x: x[1], reverse=True)[:top_n * 2]
         top_property_ids = [pid for pid, _ in top_ids]
 
-        # Read properties – only existing ones will be returned
+        # read properties
         properties = models.execute_kw(
             db, uid, password,
             'property.property', 'read',
@@ -77,8 +92,7 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
         for prop_id, count in top_ids:
             prop = existing_ids.get(prop_id)
             if not prop:
-                continue  # skip missing property
-            # If active field exists and is False, skip it
+                continue
             if 'active' in prop and not prop['active']:
                 continue
             ref = prop.get('reference')
@@ -89,13 +103,14 @@ def get_top_viewed_property_links(uid, models, db, password, top_n=20):
                     "views": count
                 })
             if len(links) >= top_n:
-                break  # limit results to top_n
+                break
 
         return links
 
     except Exception as e:
         print(f"❌ Top viewed properties error: {e}")
         return []
+
 
 def get_views_grouped_by_month(uid, models, db, password):
     domain = []
@@ -117,10 +132,12 @@ def get_views_grouped_by_month(uid, models, db, password):
                 db, uid, password,
                 'property.view', 'read',
                 [batch_ids],
-                {'fields': ['date']}
+                {'fields': ['date', 'user_agent']}
             )
-            for view in records:
-                date_str = view.get('date')
+            for v in records:
+                if is_bot(v):
+                    continue
+                date_str = v.get('date')
                 if date_str:
                     try:
                         dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
@@ -134,6 +151,7 @@ def get_views_grouped_by_month(uid, models, db, password):
 
     return month_counts
 
+
 def get_top_viewed_locations(uid, models, db, password, top_n=25):
     """Aggregate property.view records by location_id and return the top N locations."""
     view_counts_by_location = defaultdict(int)
@@ -141,7 +159,6 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
     offset = 0
 
     try:
-        # Get all property.view IDs
         all_ids = models.execute_kw(
             db, uid, password,
             'property.view', 'search',
@@ -149,20 +166,17 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
             {'order': 'date desc'}
         )
 
-        # Process in batches
         while offset < len(all_ids):
             batch_ids = all_ids[offset:offset + batch_size]
             views = models.execute_kw(
                 db, uid, password,
                 'property.view', 'read',
                 [batch_ids],
-                {'fields': ['property_id']}
+                {'fields': ['property_id', 'user_agent']}
             )
 
-            # Collect property IDs in this batch
             property_ids = [v['property_id'][0] for v in views if v.get('property_id')]
             if property_ids:
-                # Read location_id for these properties
                 properties = models.execute_kw(
                     db, uid, password,
                     'property.property', 'read',
@@ -171,8 +185,9 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
                 )
                 prop_location_map = {p['id']: p.get('location_id') for p in properties}
 
-                # Increment counters
                 for v in views:
+                    if is_bot(v):
+                        continue
                     prop = v.get('property_id')
                     if prop and isinstance(prop, list):
                         loc = prop_location_map.get(prop[0])
@@ -181,26 +196,24 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
 
             offset += batch_size
 
-        # Sort by total views
         top_locations = sorted(view_counts_by_location.items(),
                                key=lambda x: x[1], reverse=True)[:top_n]
         top_location_ids = [lid for lid, _ in top_locations]
 
-        # Get location names
         locations = models.execute_kw(
             db, uid, password,
-            'res.location', 'read',  # replace with the correct model name if different
+            'res.location', 'read',
             [top_location_ids],
             {'fields': ['name']}
         )
         loc_name_map = {loc['id']: loc['name'] for loc in locations}
 
         result = []
-        for lid, views in top_locations:
+        for lid, views_count in top_locations:
             result.append({
                 "location_id": lid,
                 "name": loc_name_map.get(lid, "Unknown"),
-                "views": views
+                "views": views_count
             })
         return result
 
@@ -209,7 +222,7 @@ def get_top_viewed_locations(uid, models, db, password, top_n=25):
         return []
 
 
-# Initialize the GeoLite2 reader once
+# GeoIP setup
 reader = geoip2.database.Reader('GeoLite2-Country.mmdb')
 
 def geolocate_ip(ip):
@@ -218,6 +231,7 @@ def geolocate_ip(ip):
         return response.country.name
     except Exception:
         return None
+
 
 def get_top_countries(uid, models, db, password, top_n=20):
     batch_size = 5000
@@ -242,11 +256,8 @@ def get_top_countries(uid, models, db, password, top_n=20):
         )
 
         for v in views:
-            ua = (v.get('user_agent') or '').lower()
-            # skip known bots
-            if 'gptbot' in ua or 'claudebot' in ua or 'spider' in ua:
+            if is_bot(v):
                 continue
-
             ip = v.get('ip')
             if not ip:
                 continue
@@ -264,11 +275,11 @@ def get_top_countries(uid, models, db, password, top_n=20):
     top_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)[:top_n]
     return [{"country": c, "views": v} for c, v in top_countries]
 
+
 def get_views_by_price_range(uid, models, db, password):
     """
     Calculate total views for properties grouped by price ranges.
     """
-    # Step 1: Gather all property views
     view_counts = defaultdict(int)
     batch_size = 5000
     offset = 0
@@ -286,10 +297,12 @@ def get_views_by_price_range(uid, models, db, password):
             db, uid, password,
             'property.view', 'read',
             [batch_ids],
-            {'fields': ['property_id']}
+            {'fields': ['property_id', 'user_agent']}
         )
 
         for v in views:
+            if is_bot(v):
+                continue
             prop = v.get('property_id')
             if prop and isinstance(prop, list):
                 view_counts[prop[0]] += 1
@@ -299,7 +312,6 @@ def get_views_by_price_range(uid, models, db, password):
     if not view_counts:
         return {}
 
-
     property_ids = list(view_counts.keys())
     properties = models.execute_kw(
         db, uid, password,
@@ -308,25 +320,23 @@ def get_views_by_price_range(uid, models, db, password):
         {'fields': ['list_price']}
     )
 
-    # Step 3: Define price bins
     bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 50)]  # up to 5M
     price_ranges = {f"{low}-{high}": 0 for (low, high) in bins}
 
-    # Step 4: Aggregate
     for prop in properties:
         price = prop.get('list_price') or 0
-        views = view_counts.get(prop['id'], 0)
+        views_count = view_counts.get(prop['id'], 0)
 
         for low, high in bins:
             if low <= price < high:
                 key = f"{low}-{high}"
-                price_ranges[key] += views
+                price_ranges[key] += views_count
                 break
 
-    # Remove empty bins (optional)
     price_ranges = {k: v for k, v in price_ranges.items() if v > 0}
 
     return price_ranges
+
 
 def generate_inquiry_stats():
     uid, models, db, password = connect_to_odoo()
@@ -346,7 +356,7 @@ def generate_inquiry_stats():
     months = get_all_months_this_year()
     results = {}
 
-    # 🔁 Add property views
+    # Property views per month
     views_per_month = get_views_grouped_by_month(uid, models, db, password)
 
     for month in months:
@@ -416,24 +426,15 @@ def generate_inquiry_stats():
             "referrals": dict(referral_source_counts)
         }
 
-
-
-    top_links = get_top_viewed_property_links(uid, models, db, password)
-    results["top_viewed_links"] = top_links
-
-    top_locations = get_top_viewed_locations(uid, models, db, password)
-
-    results["top_viewed_locations"] = top_locations
-
-    top_countries = get_top_countries(uid, models, db, password)
-    results["top_viewer_countries"] = top_countries
-
-    views_by_price_range = get_views_by_price_range(uid, models, db, password)
-    results["views_by_price_range"] = views_by_price_range
+    results["top_viewed_links"] = get_top_viewed_property_links(uid, models, db, password)
+    results["top_viewed_locations"] = get_top_viewed_locations(uid, models, db, password)
+    results["top_viewer_countries"] = get_top_countries(uid, models, db, password)
+    results["views_by_price_range"] = get_views_by_price_range(uid, models, db, password)
 
     with open("inquiry_stats.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
     print("✅ inquiry_stats.json updated!")
+
 
 if __name__ == "__main__":
     generate_inquiry_stats()
