@@ -91,7 +91,7 @@
   },
   "2025-05": {
     "autoimport_total": 137,
-    "wishlist_total": 7,
+    "wishlist_total": 6,
     "property_views": 15820,
     "sources": {
       "Subject: Kyero.com": 35,
@@ -103,7 +103,6 @@
     "referrals": {
       "Second Home Spanje": 1,
       "Find Your Dream Home in Spain campaign": 1,
-      "Kyero": 1,
       "(None)": 1,
       "AbraCasaBra Luxury Estate website": 1,
       "Think Spain": 1,
@@ -133,31 +132,47 @@
     }
   },
   "2025-07": {
-    "autoimport_total": 105,
-    "wishlist_total": 8,
-    "property_views": 13837,
+    "autoimport_total": 124,
+    "wishlist_total": 10,
+    "property_views": 17897,
     "sources": {
-      "Subject: Kyero.com": 31,
-      "Subject: Idealista": 37,
-      "Subject: Indomio": 5,
-      "Subject: AbraCasaBra Form": 23,
-      "Subject: thinkSPAIN": 15,
-      "Subject: Pisos.com": 12
+      "Subject: Kyero.com": 37,
+      "Subject: Idealista": 43,
+      "Subject: Indomio": 6,
+      "Subject: AbraCasaBra Form": 26,
+      "Subject: thinkSPAIN": 17,
+      "Subject: Pisos.com": 16
     },
     "referrals": {
       "A B&B": 1,
-      "Second Home Spanje": 2,
+      "Second Home Spanje": 3,
       "Facebook": 2,
+      "(None)": 1,
       "Idealista": 2,
       "AbraCasaBra Real Estate website": 1
     }
   },
   "2025-08": {
-    "autoimport_total": 0,
-    "wishlist_total": 0,
-    "property_views": 0,
-    "sources": {},
-    "referrals": {}
+    "autoimport_total": 122,
+    "wishlist_total": 12,
+    "property_views": 26673,
+    "sources": {
+      "Subject: Kyero.com": 34,
+      "Subject: Idealista": 48,
+      "Subject: Indomio": 3,
+      "Subject: AbraCasaBra Form": 29,
+      "Subject: thinkSPAIN": 9,
+      "Subject: Pisos.com": 16
+    },
+    "referrals": {
+      "(None)": 2,
+      "Other": 3,
+      "Friend": 1,
+      "Kyero": 2,
+      "AbraCasaBra office": 1,
+      "AbraCasaBra Real Estate website": 2,
+      "Second Home Spanje": 1
+    }
   },
   "2025-09": {
     "autoimport_total": 0,
@@ -191,159 +206,144 @@
     {
       "ref": "R4770874",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4770874",
-      "views": 5663
+      "views": 5698
     },
     {
-      "ref": "R4926433",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4926433",
-      "views": 3318
-    },
-    {
-      "ref": "R4881103",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4881103",
-      "views": 2940
+      "ref": "R4769830",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4769830",
+      "views": 5287
     },
     {
       "ref": "R4773838",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4773838",
-      "views": 2752
+      "views": 2904
     },
     {
       "ref": "R4774087",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4774087",
-      "views": 2567
-    },
-    {
-      "ref": "R4827703",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4827703",
-      "views": 2343
+      "views": 2661
     },
     {
       "ref": "R4783087",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4783087",
-      "views": 2194
+      "views": 2218
     },
     {
       "ref": "R4773808",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4773808",
-      "views": 1785
+      "views": 1804
     },
     {
       "ref": "R4774111",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4774111",
-      "views": 1604
+      "views": 1641
     },
     {
       "ref": "R4773409",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4773409",
-      "views": 1548
+      "views": 1592
     },
     {
       "ref": "R4790062",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4790062",
-      "views": 1500
-    },
-    {
-      "ref": "R4867687",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4867687",
-      "views": 1381
-    },
-    {
-      "ref": "R4597255",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4597255",
-      "views": 1318
-    },
-    {
-      "ref": "R5010418",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R5010418",
-      "views": 1310
-    },
-    {
-      "ref": "R4334497",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4334497",
-      "views": 1297
-    },
-    {
-      "ref": "R4944028",
-      "link": "https://abracasabra-realestate.com/property/?ref_no=R4944028",
-      "views": 1247
+      "views": 1584
     },
     {
       "ref": "R4774069",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R4774069",
-      "views": 1198
+      "views": 1446
+    },
+    {
+      "ref": "R4867687",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4867687",
+      "views": 1427
+    },
+    {
+      "ref": "R4334497",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R4334497",
+      "views": 1366
+    },
+    {
+      "ref": "R5010418",
+      "link": "https://abracasabra-realestate.com/property/?ref_no=R5010418",
+      "views": 1341
     },
     {
       "ref": "R5069821",
       "link": "https://abracasabra-realestate.com/property/?ref_no=R5069821",
-      "views": 1167
+      "views": 1292
     }
   ],
   "top_viewed_locations": [
     {
       "location_id": 63,
       "name": "Canillas de Aceituno",
-      "views": 46508
+      "views": 47856
     },
     {
       "location_id": 324,
       "name": "Comares",
-      "views": 27607
+      "views": 28976
     },
     {
       "location_id": 57,
       "name": "Arenas",
-      "views": 20635
+      "views": 22992
     },
     {
       "location_id": 226,
       "name": "Almog\u00eda",
-      "views": 14288
+      "views": 15208
     },
     {
       "location_id": 36,
       "name": "C\u00f3mpeta",
-      "views": 11011
-    },
-    {
-      "location_id": 45,
-      "name": "Alcauc\u00edn",
-      "views": 8546
+      "views": 12709
     },
     {
       "location_id": 26,
       "name": "Riogordo",
-      "views": 8438
+      "views": 9140
+    },
+    {
+      "location_id": 45,
+      "name": "Alcauc\u00edn",
+      "views": 9079
     },
     {
       "location_id": 228,
       "name": "Alora",
-      "views": 6601
+      "views": 6979
     },
     {
       "location_id": 30,
       "name": "Sayalonga",
-      "views": 5901
-    },
-    {
-      "location_id": 32,
-      "name": "Sedella",
-      "views": 5849
+      "views": 6719
     },
     {
       "location_id": 188,
       "name": "Estepona (town)",
-      "views": 5205
+      "views": 6458
+    },
+    {
+      "location_id": 32,
+      "name": "Sedella",
+      "views": 6346
+    },
+    {
+      "location_id": 1929,
+      "name": "Izn\u00e1jar",
+      "views": 5490
     },
     {
       "location_id": 295,
       "name": "Mijas",
-      "views": 4577
+      "views": 5050
     },
     {
       "location_id": 322,
       "name": "Colmenar",
-      "views": 3590
+      "views": 3595
     },
     {
       "location_id": 1944,
@@ -351,192 +351,188 @@
       "views": 3495
     },
     {
-      "location_id": 176,
-      "name": "Torrox (town)",
-      "views": 3155
-    },
-    {
       "location_id": 224,
       "name": "Alhaur\u00edn el Grande",
-      "views": 2916
+      "views": 3383
     },
     {
-      "location_id": 128,
-      "name": "Villanueva del Trabuco",
-      "views": 2680
+      "location_id": 176,
+      "name": "Torrox (town)",
+      "views": 3370
     },
     {
       "location_id": 870,
       "name": "V\u00e9lez de Benaudalla",
-      "views": 2426
+      "views": 2859
     },
     {
-      "location_id": 164,
-      "name": "Casabermeja",
-      "views": 2327
-    },
-    {
-      "location_id": 317,
-      "name": "Torremolinos (town)",
-      "views": 2227
+      "location_id": 128,
+      "name": "Villanueva del Trabuco",
+      "views": 2704
     },
     {
       "location_id": 270,
       "name": "Co\u00edn",
-      "views": 2219
-    },
-    {
-      "location_id": 181,
-      "name": "V\u00e9lez-M\u00e1laga (town)",
-      "views": 2215
-    },
-    {
-      "location_id": 276,
-      "name": "M\u00e1laga (town)",
-      "views": 2157
+      "views": 2561
     },
     {
       "location_id": 214,
       "name": "Marbella (town)",
-      "views": 2091
+      "views": 2503
     },
     {
-      "location_id": 65,
-      "name": "Canillas de Albaida",
-      "views": 2013
+      "location_id": 276,
+      "name": "M\u00e1laga (town)",
+      "views": 2483
+    },
+    {
+      "location_id": 865,
+      "name": "Salobre\u00f1a",
+      "views": 2428
+    },
+    {
+      "location_id": 164,
+      "name": "Casabermeja",
+      "views": 2330
+    },
+    {
+      "location_id": 317,
+      "name": "Torremolinos (town)",
+      "views": 2327
     }
   ],
   "top_viewer_countries": [
     {
       "country": "Spain",
-      "views": 103827
+      "views": 109893
     },
     {
       "country": "The Netherlands",
-      "views": 56383
+      "views": 62777
     },
     {
       "country": "Belgium",
-      "views": 33404
+      "views": 37564
     },
     {
       "country": "United Kingdom",
-      "views": 17290
+      "views": 19666
     },
     {
       "country": "Germany",
-      "views": 8329
+      "views": 9345
     },
     {
       "country": "United States",
-      "views": 7308
-    },
-    {
-      "country": "France",
-      "views": 4777
-    },
-    {
-      "country": "Ireland",
-      "views": 3184
+      "views": 8443
     },
     {
       "country": "Singapore",
-      "views": 2743
+      "views": 8126
+    },
+    {
+      "country": "France",
+      "views": 5478
+    },
+    {
+      "country": "Ireland",
+      "views": 3440
     },
     {
       "country": "Sweden",
-      "views": 2411
-    },
-    {
-      "country": "Canada",
-      "views": 2228
-    },
-    {
-      "country": "Ukraine",
-      "views": 2209
+      "views": 2772
     },
     {
       "country": "Denmark",
-      "views": 2180
+      "views": 2685
+    },
+    {
+      "country": "Canada",
+      "views": 2451
+    },
+    {
+      "country": "Ukraine",
+      "views": 2217
     },
     {
       "country": "Switzerland",
-      "views": 1550
-    },
-    {
-      "country": "Israel",
-      "views": 1238
+      "views": 1789
     },
     {
       "country": "Poland",
-      "views": 1169
+      "views": 1340
+    },
+    {
+      "country": "Israel",
+      "views": 1255
     },
     {
       "country": "Hungary",
-      "views": 758
+      "views": 826
     },
     {
       "country": "Portugal",
-      "views": 564
+      "views": 684
+    },
+    {
+      "country": "Norway",
+      "views": 600
     },
     {
       "country": "Czechia",
-      "views": 499
-    },
-    {
-      "country": "Australia",
-      "views": 472
+      "views": 557
     }
   ],
   "views_by_price_range": {
-    "0-100000": 17277,
-    "100000-200000": 36347,
-    "200000-300000": 56986,
-    "300000-400000": 50476,
-    "400000-500000": 41553,
-    "500000-600000": 12645,
-    "600000-700000": 10782,
-    "700000-800000": 6473,
-    "800000-900000": 7237,
-    "900000-1000000": 4290,
-    "1000000-1100000": 490,
-    "1100000-1200000": 1473,
-    "1200000-1300000": 3850,
-    "1300000-1400000": 3076,
-    "1400000-1500000": 463,
-    "1500000-1600000": 284,
-    "1600000-1700000": 506,
-    "1700000-1800000": 170,
-    "1800000-1900000": 1361,
-    "1900000-2000000": 368,
-    "2000000-2100000": 73,
-    "2100000-2200000": 38,
-    "2200000-2300000": 212,
-    "2300000-2400000": 49,
-    "2400000-2500000": 93,
-    "2500000-2600000": 113,
-    "2600000-2700000": 241,
-    "2700000-2800000": 394,
-    "2800000-2900000": 74,
-    "2900000-3000000": 258,
-    "3000000-3100000": 77,
-    "3100000-3200000": 49,
-    "3200000-3300000": 1346,
-    "3300000-3400000": 25,
-    "3400000-3500000": 6,
-    "3500000-3600000": 68,
-    "3600000-3700000": 45,
-    "3700000-3800000": 17,
-    "3800000-3900000": 37,
-    "3900000-4000000": 88,
-    "4000000-4100000": 8,
-    "4100000-4200000": 5,
-    "4200000-4300000": 125,
-    "4300000-4400000": 2,
-    "4500000-4600000": 44,
-    "4600000-4700000": 1,
-    "4700000-4800000": 18,
-    "4800000-4900000": 21,
-    "4900000-5000000": 44
+    "0-100000": 17580,
+    "100000-200000": 38142,
+    "200000-300000": 62284,
+    "300000-400000": 55680,
+    "400000-500000": 46609,
+    "500000-600000": 19412,
+    "600000-700000": 12079,
+    "700000-800000": 7342,
+    "800000-900000": 8591,
+    "900000-1000000": 4808,
+    "1000000-1100000": 586,
+    "1100000-1200000": 1613,
+    "1200000-1300000": 4181,
+    "1300000-1400000": 3307,
+    "1400000-1500000": 586,
+    "1500000-1600000": 351,
+    "1600000-1700000": 690,
+    "1700000-1800000": 220,
+    "1800000-1900000": 1439,
+    "1900000-2000000": 487,
+    "2000000-2100000": 90,
+    "2100000-2200000": 64,
+    "2200000-2300000": 240,
+    "2300000-2400000": 73,
+    "2400000-2500000": 113,
+    "2500000-2600000": 148,
+    "2600000-2700000": 259,
+    "2700000-2800000": 452,
+    "2800000-2900000": 83,
+    "2900000-3000000": 390,
+    "3000000-3100000": 94,
+    "3100000-3200000": 53,
+    "3200000-3300000": 1413,
+    "3300000-3400000": 38,
+    "3400000-3500000": 14,
+    "3500000-3600000": 81,
+    "3600000-3700000": 48,
+    "3700000-3800000": 26,
+    "3800000-3900000": 52,
+    "3900000-4000000": 129,
+    "4000000-4100000": 14,
+    "4100000-4200000": 7,
+    "4200000-4300000": 148,
+    "4300000-4400000": 3,
+    "4400000-4500000": 1,
+    "4500000-4600000": 58,
+    "4600000-4700000": 2,
+    "4700000-4800000": 34,
+    "4800000-4900000": 36,
+    "4900000-5000000": 50
   }
 }
