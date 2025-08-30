@@ -528,11 +528,15 @@ if (Object.keys(priceNatData).length > 0) {
   Object.values(priceNatData).forEach(ranges => {
     Object.keys(ranges).forEach(r => allRanges.add(r));
   });
-  const priceRanges = Array.from(allRanges).sort((a, b) => {
-    const aLow = parseInt(a.split("-")[0]) || 5000000;
-    const bLow = parseInt(b.split("-")[0]) || 5000000;
-    return aLow - bLow;
-  });
+const priceRanges = Array.from(allRanges).sort((a, b) => {
+  // Handle the "5000000+" special case → always last
+  if (a.includes("+")) return 1;
+  if (b.includes("+")) return -1;
+
+  const aLow = parseInt(a.split("-")[0]) || 0;
+  const bLow = parseInt(b.split("-")[0]) || 0;
+  return aLow - bLow;
+});
 
   // Sum totals per country (to decide dataset order)
   const countryTotals = {};
@@ -586,15 +590,14 @@ if (Object.keys(priceNatData).length > 0) {
       scales: {
         x: {
           stacked: true,
-          ticks: {
-            callback: function(value, index) {
-              const range = this.getLabelForValue(value).split("-");
-              const low = parseInt(range[0]);
-              const high = parseInt(range[1]);
-              if (isNaN(low) || isNaN(high)) return range; // fallback
-              return `${low/1000}k-${high/1000}k`;
-            }
-          }
+ticks: {
+  callback: function(value, index) {
+    const range = this.getLabelForValue(value);
+    if (range.includes("+")) return "5M+";
+    const [low, high] = range.split("-").map(n => parseInt(n));
+    return `${low/1000}k-${high/1000}k`;
+  }
+}
         },
         y: { stacked: true, beginAtZero: true }
       }
