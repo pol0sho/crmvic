@@ -290,6 +290,8 @@ thead {
   background-color: #fafafa;
 }
 
+
+
 #priceNationalityChart {
   max-height: 90vh !important; /* taller */
   aspect-ratio: auto;          /* let height expand */
@@ -528,15 +530,15 @@ if (Object.keys(priceNatData).length > 0) {
   Object.values(priceNatData).forEach(ranges => {
     Object.keys(ranges).forEach(r => allRanges.add(r));
   });
-const priceRanges = Array.from(allRanges).sort((a, b) => {
-  // Handle the "5000000+" special case → always last
-  if (a.includes("+")) return 1;
-  if (b.includes("+")) return -1;
 
-  const aLow = parseInt(a.split("-")[0]) || 0;
-  const bLow = parseInt(b.split("-")[0]) || 0;
-  return aLow - bLow;
-});
+  const priceRanges = Array.from(allRanges).sort((a, b) => {
+    // Handle the "5000000+" special case → always last
+    if (a.includes("+")) return 1;
+    if (b.includes("+")) return -1;
+    const aLow = parseInt(a.split("-")[0]) || 0;
+    const bLow = parseInt(b.split("-")[0]) || 0;
+    return aLow - bLow;
+  });
 
   // Sum totals per country (to decide dataset order)
   const countryTotals = {};
@@ -570,7 +572,6 @@ const priceRanges = Array.from(allRanges).sort((a, b) => {
           position: "right",
           labels: {
             generateLabels: function(chart) {
-              // Legend items follow dataset order (sorted already)
               const datasets = chart.data.datasets;
               return datasets.map((ds, i) => ({
                 text: ds.label,
@@ -582,22 +583,20 @@ const priceRanges = Array.from(allRanges).sort((a, b) => {
           }
         },
         datalabels: {
-          color: "#333",
-          font: { weight: "bold" },
-          formatter: v => v > 0 ? v : ""
+          display: false // ✅ hide numbers on bars
         }
       },
       scales: {
         x: {
           stacked: true,
-ticks: {
-  callback: function(value, index) {
-    const range = this.getLabelForValue(value);
-    if (range.includes("+")) return "5M+";
-    const [low, high] = range.split("-").map(n => parseInt(n));
-    return `${low/1000}k-${high/1000}k`;
-  }
-}
+          ticks: {
+            callback: function(value, index) {
+              const range = this.getLabelForValue(value);
+              if (range.includes("+")) return "5M+";
+              const [low, high] = range.split("-").map(n => parseInt(n));
+              return `${low/1000}k-${high/1000}k`;
+            }
+          }
         },
         y: { stacked: true, beginAtZero: true }
       }
@@ -605,6 +604,7 @@ ticks: {
     plugins: [ChartDataLabels]
   });
 }
+
 
 const topProperties = data["top_viewed_links"] || [];
 if (topProperties.length > 0) {
