@@ -290,6 +290,11 @@ thead {
   background-color: #fafafa;
 }
 
+#priceNationalityChart {
+  max-height: 90vh !important; /* taller */
+  aspect-ratio: auto;          /* let height expand */
+}
+
 .top-properties-table a {
   color: #2563EB;
   text-decoration: none;
@@ -529,14 +534,22 @@ if (Object.keys(priceNatData).length > 0) {
     return aLow - bLow;
   });
 
-  // One dataset per country
-  const datasets = Object.keys(priceNatData).map((country, idx) => {
-    return {
-      label: country,
-      data: priceRanges.map(r => priceNatData[country][r] || 0),
-      backgroundColor: `hsl(${(idx * 50) % 360}, 60%, 60%)`
-    };
+  // Sum totals per country (to decide dataset order)
+  const countryTotals = {};
+  Object.entries(priceNatData).forEach(([country, ranges]) => {
+    countryTotals[country] = Object.values(ranges).reduce((a, b) => a + b, 0);
   });
+
+  // Sort countries by total views DESC
+  const sortedCountries = Object.keys(countryTotals).sort(
+    (a, b) => countryTotals[b] - countryTotals[a]
+  );
+
+  const datasets = sortedCountries.map((country, idx) => ({
+    label: country,
+    data: priceRanges.map(r => priceNatData[country]?.[r] || 0),
+    backgroundColor: `hsl(${(idx * 50) % 360}, 60%, 60%)`
+  }));
 
   new Chart(document.getElementById("priceNationalityChart"), {
     type: "bar",
@@ -549,7 +562,21 @@ if (Object.keys(priceNatData).length > 0) {
       maintainAspectRatio: false,
       plugins: {
         tooltip: { mode: "index", intersect: false },
-        legend: { position: "top" },
+        legend: {
+          position: "right",
+          labels: {
+            generateLabels: function(chart) {
+              // Legend items follow dataset order (sorted already)
+              const datasets = chart.data.datasets;
+              return datasets.map((ds, i) => ({
+                text: ds.label,
+                fillStyle: ds.backgroundColor,
+                hidden: !chart.isDatasetVisible(i),
+                datasetIndex: i
+              }));
+            }
+          }
+        },
         datalabels: {
           color: "#333",
           font: { weight: "bold" },
@@ -557,7 +584,18 @@ if (Object.keys(priceNatData).length > 0) {
         }
       },
       scales: {
-        x: { stacked: true },
+        x: {
+          stacked: true,
+          ticks: {
+            callback: function(value, index) {
+              const range = this.getLabelForValue(value).split("-");
+              const low = parseInt(range[0]);
+              const high = parseInt(range[1]);
+              if (isNaN(low) || isNaN(high)) return range; // fallback
+              return `${low/1000}k-${high/1000}k`;
+            }
+          }
+        },
         y: { stacked: true, beginAtZero: true }
       }
     },
