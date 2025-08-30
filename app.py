@@ -328,6 +328,9 @@ max-height: 60vh;
 <h3 style="text-align:center; margin-top:3rem;">Views by Price Range</h3>
 <canvas id="priceRangeChart"></canvas>
 
+<h3 style="text-align:center; margin-top:3rem;">Views by Price Range & Nationality</h3>
+<canvas id="priceNationalityChart"></canvas>
+
 <h3 style="text-align:center; margin-top:3rem;">Most Viewed Properties Of All Time</h3>
 <div id="topPropertiesContainer" style="overflow-x:auto; max-width:1400px; margin:2rem auto;"></div>
 
@@ -507,6 +510,56 @@ if (topCountries.length > 0) {
         }
       },
       scales: { y: { beginAtZero: true } }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+// === Views by Price Range & Nationality ===
+const priceNatData = data["views_by_price_and_nationality"] || {};
+if (Object.keys(priceNatData).length > 0) {
+  // Collect all price ranges across all countries
+  const allRanges = new Set();
+  Object.values(priceNatData).forEach(ranges => {
+    Object.keys(ranges).forEach(r => allRanges.add(r));
+  });
+  const priceRanges = Array.from(allRanges).sort((a, b) => {
+    const aLow = parseInt(a.split("-")[0]) || 5000000;
+    const bLow = parseInt(b.split("-")[0]) || 5000000;
+    return aLow - bLow;
+  });
+
+  // One dataset per country
+  const datasets = Object.keys(priceNatData).map((country, idx) => {
+    return {
+      label: country,
+      data: priceRanges.map(r => priceNatData[country][r] || 0),
+      backgroundColor: `hsl(${(idx * 50) % 360}, 60%, 60%)`
+    };
+  });
+
+  new Chart(document.getElementById("priceNationalityChart"), {
+    type: "bar",
+    data: {
+      labels: priceRanges,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: { mode: "index", intersect: false },
+        legend: { position: "top" },
+        datalabels: {
+          color: "#333",
+          font: { weight: "bold" },
+          formatter: v => v > 0 ? v : ""
+        }
+      },
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, beginAtZero: true }
+      }
     },
     plugins: [ChartDataLabels]
   });

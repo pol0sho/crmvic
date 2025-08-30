@@ -337,6 +337,85 @@ def get_views_by_price_range(uid, models, db, password):
 
     return price_ranges
 
+def get_views_by_price_and_nationality(uid, models, db, password):
+    """
+    Calculate total views grouped by nationality and property price ranges.
+    """
+    batch_size = 5000
+    offset = 0
+    view_data = []   # [(prop_id, ip)]
+
+    all_ids = models.execute_kw(
+        db, uid, password,
+        'property.view', 'search',
+        [[]],
+        {'order': 'date desc'}
+    )
+
+    while offset < len(all_ids):
+        batch_ids = all_ids[offset:offset + batch_size]
+        views = models.execute_kw(
+            db, uid, password,
+            'property.view', 'read',
+            [batch_ids],
+            {'fields': ['property_id', 'ip', 'user_agent']}
+        )
+
+        for v in views:
+            if is_bot(v):
+                continue
+            prop = v.get('property_id')
+            ip = v.get('ip')
+            if prop and isinstance(prop, list) and ip:
+                view_data.append((prop[0], ip))
+        offset += batch_size
+
+    if not view_data:
+        return {}
+
+    # Collect property prices
+    property_ids = list({pid for pid, _ in view_data})
+    properties = models.execute_kw(
+        db, uid, password,
+        'property.property', 'read',
+        [property_ids],
+        {'fields': ['list_price']}
+    )
+    prop_price_map = {p['id']: p.get('list_price') or 0 for p in properties}
+
+    # Define price bins
+    bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 50)]  # up to 5M
+    price_labels = [f"{low}-{high}" for low, high in bins]
+
+    def get_price_range(price):
+        for (low, high) in bins:
+            if low <= price < high:
+                return f"{low}-{high}"
+        return "5000000+"
+
+    # Cache IP -> country
+    ip_cache = {}
+    def resolve_country(ip):
+        if ip in ip_cache:
+            return ip_cache[ip]
+        country = geolocate_ip(ip) or "Unknown"
+        ip_cache[ip] = country
+        return country
+
+    # Aggregate
+    results = defaultdict(lambda: defaultdict(int))
+    for prop_id, ip in view_data:
+        price = prop_price_map.get(prop_id, 0)
+        price_range = get_price_range(price)
+        country = resolve_country(ip)
+        results[country][price_range] += 1
+
+    # Convert to normal dict
+    results = {country: dict(ranges) for country, ranges in results.items()}
+
+    return results
+
+
 
 def generate_inquiry_stats():
     uid, models, db, password = connect_to_odoo()
@@ -430,6 +509,8 @@ def generate_inquiry_stats():
     results["top_viewed_locations"] = get_top_viewed_locations(uid, models, db, password)
     results["top_viewer_countries"] = get_top_countries(uid, models, db, password)
     results["views_by_price_range"] = get_views_by_price_range(uid, models, db, password)
+    results["views_by_price_and_nationality"] = get_views_by_price_and_nationality(uid, models, db, password)
+
 
     with open("inquiry_stats.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
