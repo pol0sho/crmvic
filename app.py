@@ -525,43 +525,40 @@ if (topCountries.length > 0) {
 // === Views by Price Range & Nationality ===
 const priceNatData = data["views_by_price_and_nationality"] || {};
 if (Object.keys(priceNatData).length > 0) {
-  // 🟢 Step 1: normalize ranges → merge all >= 600000 into one
   const mergedData = {};
 
   Object.entries(priceNatData).forEach(([country, ranges]) => {
     mergedData[country] = {};
-    let over600kTotal = 0;
+    let over1_5MTotal = 0;
 
     Object.entries(ranges).forEach(([range, count]) => {
-      let low = 0;
-      let high = 0;
+      let low = 0, high = 0;
 
       if (range.includes("+")) {
-        low = parseInt(range); // e.g. "5000000+" → 5000000
+        low = parseInt(range);
         high = Infinity;
       } else {
         [low, high] = range.split("-").map(n => parseInt(n));
       }
 
-      if (low >= 600000) {
-        over600kTotal += count;
+      if (low >= 1500000) {
+        over1_5MTotal += count;
       } else {
         mergedData[country][range] = (mergedData[country][range] || 0) + count;
       }
     });
 
-    if (over600kTotal > 0) {
-      mergedData[country]["600000+"] = over600kTotal;
+    if (over1_5MTotal > 0) {
+      mergedData[country]["1500000+"] = over1_5MTotal;
     }
   });
 
-  // 🟢 Step 2: collect all ranges again (after merge)
+  // build ranges + chart like before …
   const allRanges = new Set();
   Object.values(mergedData).forEach(ranges => {
     Object.keys(ranges).forEach(r => allRanges.add(r));
   });
 
-  // Sort ranges: numeric, with "600000+" last
   const priceRanges = Array.from(allRanges).sort((a, b) => {
     if (a.includes("+")) return 1;
     if (b.includes("+")) return -1;
@@ -587,31 +584,18 @@ if (Object.keys(priceNatData).length > 0) {
   }));
 
   // 🟢 Step 5: draw chart
-  new Chart(document.getElementById("priceNationalityChart"), {
+ new Chart(document.getElementById("priceNationalityChart"), {
     type: "bar",
     data: { labels: priceRanges, datasets },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          mode: "index",
-          intersect: false,
-          itemSort: (a, b) => b.raw - a.raw, // high → low
-          callbacks: {
-            label: ctx => `${ctx.dataset.label}: ${ctx.raw} views`
-          }
-        },
-        legend: { position: "right" },
-        datalabels: { display: false }
-      },
+      // …
       scales: {
         x: {
           stacked: true,
           ticks: {
-            callback: function(value, index) {
+            callback: function(value) {
               const range = this.getLabelForValue(value);
-              if (range.includes("+")) return "600k+";
+              if (range.includes("+")) return "1.5M+";
               const [low, high] = range.split("-").map(n => parseInt(n));
               return `${low / 1000}k-${high / 1000}k`;
             }
@@ -623,7 +607,6 @@ if (Object.keys(priceNatData).length > 0) {
     plugins: [ChartDataLabels]
   });
 }
-
 
 
 const topProperties = data["top_viewed_links"] || [];
