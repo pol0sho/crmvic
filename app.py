@@ -437,9 +437,43 @@ sources.forEach((src, i) => {
 // === Price Range Views Chart ===
 const priceRangeData = data["views_by_price_range"] || {};
 if (Object.keys(priceRangeData).length > 0) {
-  const labels = Object.keys(priceRangeData);
-  const values = Object.values(priceRangeData);
+  // 🟢 Step 1: merge all ranges >= 1500000 into one
+  const mergedData = {};
+  let over1_5MTotal = 0;
 
+  Object.entries(priceRangeData).forEach(([range, count]) => {
+    let low = 0, high = 0;
+
+    if (range.includes("+")) {
+      low = parseInt(range);
+      high = Infinity;
+    } else {
+      [low, high] = range.split("-").map(n => parseInt(n));
+    }
+
+    if (low >= 1500000) {
+      over1_5MTotal += count;
+    } else {
+      mergedData[range] = (mergedData[range] || 0) + count;
+    }
+  });
+
+  if (over1_5MTotal > 0) {
+    mergedData["1500000+"] = over1_5MTotal;
+  }
+
+  // 🟢 Step 2: sort ranges
+  const labels = Object.keys(mergedData).sort((a, b) => {
+    if (a.includes("+")) return 1;
+    if (b.includes("+")) return -1;
+    const aLow = parseInt(a.split("-")[0]) || 0;
+    const bLow = parseInt(b.split("-")[0]) || 0;
+    return aLow - bLow;
+  });
+
+  const values = labels.map(l => mergedData[l]);
+
+  // 🟢 Step 3: build chart
   new Chart(document.getElementById("priceRangeChart"), {
     type: "bar",
     data: {
@@ -472,11 +506,10 @@ if (Object.keys(priceRangeData).length > 0) {
         x: {
           ticks: {
             callback: function(value, index) {
-              // Show range in millions/k for clarity
-              const range = labels[index].split("-");
-              const low = parseInt(range[0]);
-              const high = parseInt(range[1]);
-              return `${(low/1000)}k-${(high/1000)}k`;
+              const range = labels[index];
+              if (range.includes("+")) return "1.5M+";
+              const [low, high] = range.split("-").map(n => parseInt(n));
+              return `${low/1000}k-${high/1000}k`;
             }
           }
         },
@@ -485,8 +518,7 @@ if (Object.keys(priceRangeData).length > 0) {
     },
     plugins: [ChartDataLabels]
   });
-} 
-
+}
 
 const topCountries = data["top_viewer_countries"] || [];
 if (topCountries.length > 0) {
@@ -525,12 +557,12 @@ if (topCountries.length > 0) {
 // === Views by Price Range & Nationality ===
 const priceNatData = data["views_by_price_and_nationality"] || {};
 if (Object.keys(priceNatData).length > 0) {
-  // 🟢 Step 1: normalize ranges → merge all >= 600000 into one
+  // 🟢 Step 1: normalize ranges → merge all >= 1500000 into one
   const mergedData = {};
 
   Object.entries(priceNatData).forEach(([country, ranges]) => {
     mergedData[country] = {};
-    let over600kTotal = 0;
+    let over1_5MTotal = 0;
 
     Object.entries(ranges).forEach(([range, count]) => {
       let low = 0;
@@ -543,15 +575,15 @@ if (Object.keys(priceNatData).length > 0) {
         [low, high] = range.split("-").map(n => parseInt(n));
       }
 
-      if (low >= 600000) {
-        over600kTotal += count;
+      if (low >= 1500000) {
+        over1_5MTotal += count;
       } else {
         mergedData[country][range] = (mergedData[country][range] || 0) + count;
       }
     });
 
-    if (over600kTotal > 0) {
-      mergedData[country]["600000+"] = over600kTotal;
+    if (over1_5MTotal > 0) {
+      mergedData[country]["1500000+"] = over1_5MTotal;
     }
   });
 
@@ -561,7 +593,7 @@ if (Object.keys(priceNatData).length > 0) {
     Object.keys(ranges).forEach(r => allRanges.add(r));
   });
 
-  // Sort ranges: numeric, with "600000+" last
+  // Sort ranges: numeric, with "1500000+" last
   const priceRanges = Array.from(allRanges).sort((a, b) => {
     if (a.includes("+")) return 1;
     if (b.includes("+")) return -1;
@@ -611,7 +643,7 @@ if (Object.keys(priceNatData).length > 0) {
           ticks: {
             callback: function(value, index) {
               const range = this.getLabelForValue(value);
-              if (range.includes("+")) return "600k+";
+              if (range.includes("+")) return "1.5M+";
               const [low, high] = range.split("-").map(n => parseInt(n));
               return `${low / 1000}k-${high / 1000}k`;
             }
