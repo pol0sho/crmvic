@@ -557,52 +557,60 @@ if (Object.keys(priceNatData).length > 0) {
     backgroundColor: `hsl(${(idx * 50) % 360}, 60%, 60%)`
   }));
 
-  new Chart(document.getElementById("priceNationalityChart"), {
-    type: "bar",
-    data: {
-      labels: priceRanges,
-      datasets: datasets
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: { mode: "index", intersect: false },
-        legend: {
-          position: "right",
-          labels: {
-            generateLabels: function(chart) {
-              const datasets = chart.data.datasets;
-              return datasets.map((ds, i) => ({
-                text: ds.label,
-                fillStyle: ds.backgroundColor,
-                hidden: !chart.isDatasetVisible(i),
-                datasetIndex: i
-              }));
-            }
-          }
-        },
-        datalabels: {
-          display: false // ✅ hide numbers on bars
+new Chart(document.getElementById("priceNationalityChart"), {
+  type: "bar",
+  data: {
+    labels: priceRanges,
+    datasets: datasets
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        mode: "index",
+        intersect: false,
+        itemSort: (a, b) => b.raw - a.raw, // 👈 sort tooltip items high → low
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ${ctx.raw} views`
         }
       },
-      scales: {
-        x: {
-          stacked: true,
-          ticks: {
-            callback: function(value, index) {
-              const range = this.getLabelForValue(value);
-              if (range.includes("+")) return "5M+";
-              const [low, high] = range.split("-").map(n => parseInt(n));
-              return `${low/1000}k-${high/1000}k`;
-            }
+      legend: {
+        position: "right",
+        labels: {
+          generateLabels: function(chart) {
+            const datasets = chart.data.datasets;
+            return datasets.map((ds, i) => ({
+              text: ds.label,
+              fillStyle: ds.backgroundColor,
+              hidden: !chart.isDatasetVisible(i),
+              datasetIndex: i
+            }));
           }
-        },
-        y: { stacked: true, beginAtZero: true }
+        }
+      },
+      datalabels: {
+        display: false
       }
     },
-    plugins: [ChartDataLabels]
-  });
+    scales: {
+      x: {
+        stacked: true,
+        ticks: {
+          callback: function(value, index) {
+            const range = this.getLabelForValue(value);
+            if (range.includes("+")) return "5M+";
+            const [low, high] = range.split("-").map(n => parseInt(n));
+            return `${low / 1000}k-${high / 1000}k`;
+          }
+        }
+      },
+      y: { stacked: true, beginAtZero: true }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
 }
 
 
