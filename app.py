@@ -525,14 +525,44 @@ if (topCountries.length > 0) {
 // === Views by Price Range & Nationality ===
 const priceNatData = data["views_by_price_and_nationality"] || {};
 if (Object.keys(priceNatData).length > 0) {
-  // Collect all price ranges across all countries
+  // 🟢 Step 1: normalize ranges → merge all >= 600000 into one
+  const mergedData = {};
+
+  Object.entries(priceNatData).forEach(([country, ranges]) => {
+    mergedData[country] = {};
+    let over600kTotal = 0;
+
+    Object.entries(ranges).forEach(([range, count]) => {
+      let low = 0;
+      let high = 0;
+
+      if (range.includes("+")) {
+        low = parseInt(range); // e.g. "5000000+" → 5000000
+        high = Infinity;
+      } else {
+        [low, high] = range.split("-").map(n => parseInt(n));
+      }
+
+      if (low >= 600000) {
+        over600kTotal += count;
+      } else {
+        mergedData[country][range] = (mergedData[country][range] || 0) + count;
+      }
+    });
+
+    if (over600kTotal > 0) {
+      mergedData[country]["600000+"] = over600kTotal;
+    }
+  });
+
+  // 🟢 Step 2: collect all ranges again (after merge)
   const allRanges = new Set();
-  Object.values(priceNatData).forEach(ranges => {
+  Object.values(mergedData).forEach(ranges => {
     Object.keys(ranges).forEach(r => allRanges.add(r));
   });
 
+  // Sort ranges: numeric, with "600000+" last
   const priceRanges = Array.from(allRanges).sort((a, b) => {
-    // Handle the "5000000+" special case → always last
     if (a.includes("+")) return 1;
     if (b.includes("+")) return -1;
     const aLow = parseInt(a.split("-")[0]) || 0;
@@ -540,78 +570,60 @@ if (Object.keys(priceNatData).length > 0) {
     return aLow - bLow;
   });
 
-  // Sum totals per country (to decide dataset order)
+  // 🟢 Step 3: sort countries by total views
   const countryTotals = {};
-  Object.entries(priceNatData).forEach(([country, ranges]) => {
+  Object.entries(mergedData).forEach(([country, ranges]) => {
     countryTotals[country] = Object.values(ranges).reduce((a, b) => a + b, 0);
   });
-
-  // Sort countries by total views DESC
   const sortedCountries = Object.keys(countryTotals).sort(
     (a, b) => countryTotals[b] - countryTotals[a]
   );
 
+  // 🟢 Step 4: build datasets
   const datasets = sortedCountries.map((country, idx) => ({
     label: country,
-    data: priceRanges.map(r => priceNatData[country]?.[r] || 0),
+    data: priceRanges.map(r => mergedData[country]?.[r] || 0),
     backgroundColor: `hsl(${(idx * 50) % 360}, 60%, 60%)`
   }));
 
-new Chart(document.getElementById("priceNationalityChart"), {
-  type: "bar",
-  data: {
-    labels: priceRanges,
-    datasets: datasets
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        mode: "index",
-        intersect: false,
-        itemSort: (a, b) => b.raw - a.raw, // 👈 sort tooltip items high → low
-        callbacks: {
-          label: ctx => `${ctx.dataset.label}: ${ctx.raw} views`
-        }
-      },
-      legend: {
-        position: "right",
-        labels: {
-          generateLabels: function(chart) {
-            const datasets = chart.data.datasets;
-            return datasets.map((ds, i) => ({
-              text: ds.label,
-              fillStyle: ds.backgroundColor,
-              hidden: !chart.isDatasetVisible(i),
-              datasetIndex: i
-            }));
+  // 🟢 Step 5: draw chart
+  new Chart(document.getElementById("priceNationalityChart"), {
+    type: "bar",
+    data: { labels: priceRanges, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          mode: "index",
+          intersect: false,
+          itemSort: (a, b) => b.raw - a.raw, // high → low
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw} views`
           }
-        }
+        },
+        legend: { position: "right" },
+        datalabels: { display: false }
       },
-      datalabels: {
-        display: false
+      scales: {
+        x: {
+          stacked: true,
+          ticks: {
+            callback: function(value, index) {
+              const range = this.getLabelForValue(value);
+              if (range.includes("+")) return "600k+";
+              const [low, high] = range.split("-").map(n => parseInt(n));
+              return `${low / 1000}k-${high / 1000}k`;
+            }
+          }
+        },
+        y: { stacked: true, beginAtZero: true }
       }
     },
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          callback: function(value, index) {
-            const range = this.getLabelForValue(value);
-            if (range.includes("+")) return "5M+";
-            const [low, high] = range.split("-").map(n => parseInt(n));
-            return `${low / 1000}k-${high / 1000}k`;
-          }
-        }
-      },
-      y: { stacked: true, beginAtZero: true }
-    }
-  },
-  plugins: [ChartDataLabels]
-});
-
+    plugins: [ChartDataLabels]
+  });
 }
+
 
 
 const topProperties = data["top_viewed_links"] || [];
