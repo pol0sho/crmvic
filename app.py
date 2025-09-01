@@ -634,7 +634,7 @@ if (Object.keys(priceNatData).length > 0) {
             label: ctx => `${ctx.dataset.label}: ${ctx.raw} views`
           }
         },
-        legend: { position: "right" },
+        legend: { display: false },   // ❌ hide countries + colors
         datalabels: { display: false }
       },
       scales: {
