@@ -277,6 +277,9 @@ def get_top_countries(uid, models, db, password, top_n=20):
 
 
 def get_views_by_price_range(uid, models, db, password):
+    """
+    Calculate total views for properties grouped by price ranges.
+    """
     view_counts = defaultdict(int)
     batch_size = 5000
     offset = 0
@@ -296,12 +299,14 @@ def get_views_by_price_range(uid, models, db, password):
             [batch_ids],
             {'fields': ['property_id', 'user_agent']}
         )
+
         for v in views:
             if is_bot(v):
                 continue
             prop = v.get('property_id')
             if prop and isinstance(prop, list):
                 view_counts[prop[0]] += 1
+
         offset += batch_size
 
     if not view_counts:
@@ -315,30 +320,27 @@ def get_views_by_price_range(uid, models, db, password):
         {'fields': ['list_price']}
     )
 
-    # bins up to 600k, then "600000+"
-    bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 6)]  # 0–100k … 500–600k
+    bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 50)]  # up to 5M
     price_ranges = {f"{low}-{high}": 0 for (low, high) in bins}
-    price_ranges["600000+"] = 0
 
     for prop in properties:
         price = prop.get('list_price') or 0
         views_count = view_counts.get(prop['id'], 0)
 
-        placed = False
         for low, high in bins:
             if low <= price < high:
                 key = f"{low}-{high}"
                 price_ranges[key] += views_count
-                placed = True
                 break
-        if not placed and price >= 600000:
-            price_ranges["600000+"] += views_count
 
-    # sort by views descending
-    sorted_ranges = dict(sorted(price_ranges.items(), key=lambda x: x[1], reverse=True))
-    return sorted_ranges
+    price_ranges = {k: v for k, v in price_ranges.items() if v > 0}
+
+    return price_ranges
 
 def get_views_by_price_and_nationality(uid, models, db, password):
+    """
+    Calculate total views grouped by nationality and property price ranges.
+    """
     batch_size = 5000
     offset = 0
     view_data = []   # [(prop_id, ip)]
@@ -358,6 +360,7 @@ def get_views_by_price_and_nationality(uid, models, db, password):
             [batch_ids],
             {'fields': ['property_id', 'ip', 'user_agent']}
         )
+
         for v in views:
             if is_bot(v):
                 continue
@@ -370,6 +373,7 @@ def get_views_by_price_and_nationality(uid, models, db, password):
     if not view_data:
         return {}
 
+    # Collect property prices
     property_ids = list({pid for pid, _ in view_data})
     properties = models.execute_kw(
         db, uid, password,
@@ -379,14 +383,17 @@ def get_views_by_price_and_nationality(uid, models, db, password):
     )
     prop_price_map = {p['id']: p.get('list_price') or 0 for p in properties}
 
-    # bins up to 600k
-    bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 6)]
+    # Define price bins
+    bins = [(i * 100000, (i + 1) * 100000) for i in range(0, 50)]  # up to 5M
+    price_labels = [f"{low}-{high}" for low, high in bins]
+
     def get_price_range(price):
         for (low, high) in bins:
             if low <= price < high:
                 return f"{low}-{high}"
-        return "600000+"
+        return "5000000+"
 
+    # Cache IP -> country
     ip_cache = {}
     def resolve_country(ip):
         if ip in ip_cache:
@@ -395,6 +402,7 @@ def get_views_by_price_and_nationality(uid, models, db, password):
         ip_cache[ip] = country
         return country
 
+    # Aggregate
     results = defaultdict(lambda: defaultdict(int))
     for prop_id, ip in view_data:
         price = prop_price_map.get(prop_id, 0)
@@ -402,18 +410,11 @@ def get_views_by_price_and_nationality(uid, models, db, password):
         country = resolve_country(ip)
         results[country][price_range] += 1
 
-    # Sort countries by total views
-    sorted_results = dict(
-        sorted(results.items(), key=lambda kv: sum(kv[1].values()), reverse=True)
-    )
+    # Convert to normal dict
+    results = {country: dict(ranges) for country, ranges in results.items()}
 
-    # Sort each country’s price ranges by views DESC
-    for country in sorted_results:
-        sorted_results[country] = dict(
-            sorted(sorted_results[country].items(), key=lambda x: x[1], reverse=True)
-        )
+    return results
 
-    return sorted_results
 
 
 def generate_inquiry_stats():
