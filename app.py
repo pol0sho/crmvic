@@ -445,12 +445,7 @@ const currentYear = new Date().getFullYear();
 // Build month list for current year (YYYY-MM)
 const monthKeys = [...Array(12).keys()].map(i => `${currentYear}-${String(i+1).padStart(2,"0")}`);
 
-// Populate month selector
-const buyersMonthSelect = document.getElementById("buyersMonthSelect");
-buyersMonthSelect.innerHTML = monthKeys.map(m => {
-  const d = new Date(`${m}-01T00:00:00`);
-  return `<option value="${m}" ${d.getMonth()===new Date().getMonth() ? "selected":""}>${d.toLocaleString(undefined,{month:"long"})}</option>`;
-}).join("");
+
 
 
 
