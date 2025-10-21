@@ -454,14 +454,6 @@ buyersMonthSelect.innerHTML = monthKeys.map(m => {
 
 
 
-  r.addEventListener("change", (e) => {
-    buyersViewMode = e.target.value;
-    buyersMonthSelect.disabled = (buyersViewMode !== "monthly");
-    renderAllBuyerCharts();
-  });
-});
-buyersMonthSelect.disabled = false;
-
 
 // Helpers
 const PRICE_BUCKETS = [
