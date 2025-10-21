@@ -229,10 +229,18 @@ def get_properties():
 def get_inquiries():
     try:
         with open("inquiry_stats.json", "r", encoding="utf-8") as f:
-            data = f.read()
-            return app.response_class(data, mimetype="application/json")
-    except FileNotFoundError:
-        return jsonify(error="inquiry_stats.json not found"), 404
+            inquiry_data = json.load(f)
+        
+        with open("buyers_with_suggestions_and_notes.json", "r", encoding="utf-8") as f:
+            buyers_data = json.load(f)
+        
+        # Merge buyers_data into inquiry_data under a new key
+        inquiry_data["buyers"] = buyers_data
+
+        return app.response_class(json.dumps(inquiry_data), mimetype="application/json")
+    
+    except FileNotFoundError as e:
+        return jsonify(error=f"{e.filename} not found"), 404
 
 # === 📊 Dashboard HTML Page ===
 @app.route("/dashboard/inquiries")
