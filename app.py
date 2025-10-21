@@ -231,7 +231,7 @@ def get_inquiries():
         with open("inquiry_stats.json", "r", encoding="utf-8") as f:
             inquiry_data = json.load(f)
         
-        with open("buyers_with_suggestions_and_notes.json", "r", encoding="utf-8") as f:
+        with open("buyers_with_suggestions_and_notes_with_nationalities.json", "r", encoding="utf-8") as f:
             buyers_data = json.load(f)
         
         # Merge buyers_data into inquiry_data under a new key
@@ -332,6 +332,36 @@ max-height: 60vh;
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown Per Portal</h3>
 <canvas id="sourceBreakdownChart"></canvas>
 
+<!-- === Buyers Budget & Nationality (New) === -->
+<h3 style="text-align:center; margin-top:3rem;">Buyer Budget & Nationality (Monthly / Year-to-Date)</h3>
+
+<div style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
+  <label style="display:flex;gap:.25rem;align-items:center">
+    <input type="radio" name="buyersViewMode" value="monthly" checked>
+    Monthly
+  </label>
+  <label style="display:flex;gap:.25rem;align-items:center">
+    <input type="radio" name="buyersViewMode" value="ytd">
+    Year-to-Date
+  </label>
+
+  <select id="buyersMonthSelect" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem">
+    <!-- populated by JS with current-year months -->
+  </select>
+</div>
+
+<!-- Chart 1: Budget distribution over time -->
+<h4 style="text-align:center;margin-top:1rem;">Budget Distribution (Stacked by Price Range)</h4>
+<canvas id="buyersBudgetOverTimeChart"></canvas>
+
+<!-- Chart 2: Inquiries by Nationality (count) -->
+<h4 style="text-align:center;margin-top:2rem;">Inquiries by Nationality</h4>
+<canvas id="buyersNationalityChart"></canvas>
+
+<!-- Chart 3: Budget by Nationality (who has what budget) -->
+<h4 style="text-align:center;margin-top:2rem;">Budget by Nationality (Stacked by Price Range)</h4>
+<canvas id="buyersBudgetByNationalityChart"></canvas>
+
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
 <h3 style="text-align:center; margin-top:3rem;">Most Viewed Locations Of All Time (Property Pages)</h3>
@@ -399,6 +429,242 @@ sources.forEach((src, i) => {
     stack: "sources"
   });
 });
+
+// ====== Buyers charts (Budget & Nationality) ======
+const buyersBlock = data.buyers || data["buyers"] || null;
+const buyersRaw = buyersBlock && Array.isArray(buyersBlock.data) ? buyersBlock.data : [];
+const currentYear = new Date().getFullYear();
+
+// Build month list for current year (YYYY-MM)
+const monthKeys = [...Array(12).keys()].map(i => `${currentYear}-${String(i+1).padStart(2,"0")}`);
+
+// Populate month selector
+const buyersMonthSelect = document.getElementById("buyersMonthSelect");
+buyersMonthSelect.innerHTML = monthKeys.map(m => {
+  const d = new Date(`${m}-01T00:00:00`);
+  return `<option value="${m}" ${d.getMonth()===new Date().getMonth() ? "selected":""}>${d.toLocaleString(undefined,{month:"long"})}</option>`;
+}).join("");
+
+// Controls
+let buyersViewMode = "monthly"; // 'monthly' | 'ytd'
+document.querySelectorAll('input[name="buyersViewMode"]').forEach(r => {
+  r.addEventListener("change", (e) => {
+    buyersViewMode = e.target.value;
+    buyersMonthSelect.disabled = (buyersViewMode !== "monthly");
+    renderAllBuyerCharts();
+  });
+});
+buyersMonthSelect.disabled = false;
+buyersMonthSelect.addEventListener("change", renderAllBuyerCharts);
+
+// Helpers
+const PRICE_BUCKETS = [
+  [0,150000],[150000,300000],[300000,500000],
+  [500000,750000],[750000,1000000],[1000000,1500000],[1500000,Infinity]
+];
+const PRICE_BUCKET_LABELS = ["0–150k","150–300k","300–500k","500–750k","750k–1M","1M–1.5M","1.5M+"];
+
+function toMonthKey(ts){
+  // input like "2025-10-20 22:37:30"
+  const d = new Date(ts.replace(" ","T"));
+  if (isNaN(d.getTime())) return null;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+function inCurrentYear(rec){
+  const d = new Date(rec.inquiry_date.replace(" ","T"));
+  return d.getFullYear() === currentYear;
+}
+
+function bucketIndex(price){
+  const p = Number(price||0);
+  for (let i=0;i<PRICE_BUCKETS.length;i++){
+    const [lo,hi] = PRICE_BUCKETS[i];
+    if (p>=lo && p<hi) return i;
+  }
+  return PRICE_BUCKETS.length-1;
+}
+
+function aggregateBuyers() {
+  // Filter to current year
+  const rows = buyersRaw.filter(inCurrentYear);
+
+  // Monthly map: ym -> rows[]
+  const byMonth = new Map(monthKeys.map(m => [m, []]));
+  rows.forEach(r => {
+    const mk = toMonthKey(r.inquiry_date);
+    if (mk && byMonth.has(mk)) byMonth.get(mk).push(r);
+  });
+
+  // YTD = all rows in current year
+  const ytd = rows;
+
+  return { byMonth, ytd };
+}
+
+const buyersAgg = aggregateBuyers();
+
+// Chart instances (for clean re-render)
+let CHART_budgetOverTime = null;
+let CHART_nationality = null;
+let CHART_budgetByNationality = null;
+
+function destroyIfExists(ch){
+  if (ch && typeof ch.destroy === "function") ch.destroy();
+}
+
+// ===== Chart 1: Budget distribution over time =====
+// - Monthly: x = price buckets, values = counts for the selected month
+// - YTD:     x = months, stacked by price buckets (trend across the year)
+function renderBudgetOverTime(mode, monthKey){
+  const ctx = document.getElementById("buyersBudgetOverTimeChart");
+  destroyIfExists(CHART_budgetOverTime);
+
+  if (mode === "monthly") {
+    const rows = buyersAgg.byMonth.get(monthKey) || [];
+    const counts = Array(PRICE_BUCKETS.length).fill(0);
+    rows.forEach(r => counts[bucketIndex(r.max_price)]++);
+
+    CHART_budgetOverTime = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: PRICE_BUCKET_LABELS,
+        datasets: [{ label: `Inquiries (${monthKey})`, data: counts, backgroundColor: "rgba(54,162,235,0.7)" }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, datalabels:{ display:false } },
+        scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
+      },
+      plugins:[ChartDataLabels]
+    });
+  } else {
+    // YTD stacked by buckets over months
+    const datasets = PRICE_BUCKET_LABELS.map((label,i) => ({
+      label,
+      data: monthKeys.map(m=>{
+        const rows = buyersAgg.byMonth.get(m) || [];
+        return rows.reduce((acc,r)=> acc + (bucketIndex(r.max_price)===i ? 1 : 0), 0);
+      }),
+      backgroundColor: `hsl(${(i*45)%360},60%,60%)`,
+      stack:"buckets"
+    }));
+
+    CHART_budgetOverTime = new Chart(ctx, {
+      type:"bar",
+      data:{ labels: monthKeys, datasets },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:"top" }, datalabels:{ display:false } },
+        scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true } }
+      },
+      plugins:[ChartDataLabels]
+    });
+  }
+}
+
+// ===== Chart 2: Inquiries by Nationality (counts) =====
+// - Monthly: counts per nationality for selected month
+// - YTD:     counts per nationality across current year
+function renderNationality(mode, monthKey){
+  const ctx = document.getElementById("buyersNationalityChart");
+  destroyIfExists(CHART_nationality);
+
+  const rows = (mode==="monthly") ? (buyersAgg.byMonth.get(monthKey) || []) : buyersAgg.ytd;
+  const countsByNat = {};
+  rows.forEach(r => {
+    const nat = r.nationality || "Unknown";
+    countsByNat[nat] = (countsByNat[nat]||0)+1;
+  });
+
+  // Top 12 nationalities + others
+  const entries = Object.entries(countsByNat).sort((a,b)=>b[1]-a[1]);
+  const main = entries.slice(0,12);
+  const others = entries.slice(12).reduce((acc, [,v])=>acc+v, 0);
+  if (others>0) main.push(["Others", others]);
+
+  CHART_nationality = new Chart(ctx, {
+    type:"bar",
+    data:{
+      labels: main.map(e=>e[0]),
+      datasets:[{ label:"Inquiries", data: main.map(e=>e[1]), backgroundColor:"rgba(75,192,192,0.7)" }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, datalabels:{ display:false } },
+      scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+
+// ===== Chart 3: Budget by Nationality (stacked buckets) =====
+// - Monthly: for selected month
+// - YTD:     for current year
+function renderBudgetByNationality(mode, monthKey){
+  const ctx = document.getElementById("buyersBudgetByNationalityChart");
+  destroyIfExists(CHART_budgetByNationality);
+
+  const rows = (mode==="monthly") ? (buyersAgg.byMonth.get(monthKey) || []) : buyersAgg.ytd;
+
+  // Totals per nationality
+  const countsByNat = {};
+  rows.forEach(r=>{
+    const nat = r.nationality || "Unknown";
+    countsByNat[nat] = (countsByNat[nat]||0)+1;
+  });
+
+  // Top 10 nationalities by total
+  const topNats = Object.entries(countsByNat).sort((a,b)=>b[1]-a[1]).slice(0,10).map(e=>e[0]);
+
+  // Build matrix [nat][bucket] -> count
+  const matrix = {};
+  topNats.forEach(n => matrix[n] = Array(PRICE_BUCKETS.length).fill(0));
+  rows.forEach(r=>{
+    const nat = topNats.includes(r.nationality||"Unknown") ? (r.nationality||"Unknown") : null;
+    if (!nat) return; // skip non-top for readability
+    matrix[nat][bucketIndex(r.max_price)]++;
+  });
+
+  const datasets = PRICE_BUCKET_LABELS.map((label, i)=>({
+    label,
+    data: topNats.map(n => matrix[n][i]),
+    backgroundColor:`hsl(${(i*45)%360},60%,60%)`,
+    stack:"buckets"
+  }));
+
+  CHART_budgetByNationality = new Chart(ctx, {
+    type:"bar",
+    data:{ labels: topNats, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:"top" },
+        tooltip:{
+          mode:"index", intersect:false,
+          callbacks:{ label: (ctx)=> `${ctx.dataset.label}: ${ctx.raw}` }
+        },
+        datalabels:{ display:false }
+      },
+      scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true } }
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+
+function renderAllBuyerCharts(){
+  const mode = buyersViewMode;               // 'monthly'|'ytd'
+  const monthKey = buyersMonthSelect.value;  // YYYY-MM (used only in monthly)
+  renderBudgetOverTime(mode, monthKey);
+  renderNationality(mode, monthKey);
+  renderBudgetByNationality(mode, monthKey);
+}
+
+// Kick off once buyers are present
+if (buyersRaw.length){
+  renderAllBuyerCharts();
+}
+
 
       const topLocations = data["top_viewed_locations"] || [];
       if (topLocations.length > 0) {
@@ -829,6 +1095,8 @@ scales: {
     .catch(err => {
       alert("Failed to load data: " + err.message);
     });
+
+    
 </script>
     </body>
     </html>
