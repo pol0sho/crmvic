@@ -336,38 +336,37 @@ max-height: 60vh;
 <!-- === Buyers Budget & Nationality (New) === -->
 <h3 style="text-align:center; margin-top:3rem;">Buyer Budget & Nationality (Monthly / Year-to-Date)</h3>
 
+
+<!-- Chart 1: Budget distribution over time -->
+<h4 style="text-align:center;margin-top:1rem;">Budget Distribution (Stacked by Price Range)</h4>
 <!-- 🔹 Controls for Chart 1 -->
 <div id="controlsBudgetOverTime" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
   <label><input type="radio" name="modeBudgetOverTime" value="monthly" checked> Monthly</label>
   <label><input type="radio" name="modeBudgetOverTime" value="ytd"> Year-to-Date</label>
   <select id="monthBudgetOverTime" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
+<canvas id="buyersBudgetOverTimeChart"></canvas>
 
+<!-- Chart 2: Inquiries by Nationality (count) -->
+<h4 style="text-align:center;margin-top:2rem;">Inquiries by Nationality</h4>
 <!-- 🔹 Controls for Chart 2 -->
 <div id="controlsNationality" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
   <label><input type="radio" name="modeNationality" value="monthly" checked> Monthly</label>
   <label><input type="radio" name="modeNationality" value="ytd"> Year-to-Date</label>
   <select id="monthNationality" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
+<canvas id="buyersNationalityChart"></canvas>
 
+<!-- Chart 3: Budget by Nationality (who has what budget) -->
+<h4 style="text-align:center;margin-top:2rem;">Budget by Nationality (Stacked by Price Range)</h4>
 <!-- 🔹 Controls for Chart 3 -->
 <div id="controlsBudgetByNationality" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
   <label><input type="radio" name="modeBudgetByNationality" value="monthly" checked> Monthly</label>
   <label><input type="radio" name="modeBudgetByNationality" value="ytd"> Year-to-Date</label>
   <select id="monthBudgetByNationality" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
-
-<!-- Chart 1: Budget distribution over time -->
-<h4 style="text-align:center;margin-top:1rem;">Budget Distribution (Stacked by Price Range)</h4>
-<canvas id="buyersBudgetOverTimeChart"></canvas>
-
-<!-- Chart 2: Inquiries by Nationality (count) -->
-<h4 style="text-align:center;margin-top:2rem;">Inquiries by Nationality</h4>
-<canvas id="buyersNationalityChart"></canvas>
-
-<!-- Chart 3: Budget by Nationality (who has what budget) -->
-<h4 style="text-align:center;margin-top:2rem;">Budget by Nationality (Stacked by Price Range)</h4>
 <canvas id="buyersBudgetByNationalityChart"></canvas>
+
 
     <h3 style="text-align:center; margin-top:3rem;"> Monthly Property Views Website</h3>
     <canvas id="viewsChart"></canvas>
