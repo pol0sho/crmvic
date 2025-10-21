@@ -336,19 +336,25 @@ max-height: 60vh;
 <!-- === Buyers Budget & Nationality (New) === -->
 <h3 style="text-align:center; margin-top:3rem;">Buyer Budget & Nationality (Monthly / Year-to-Date)</h3>
 
-<div style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
-  <label style="display:flex;gap:.25rem;align-items:center">
-    <input type="radio" name="buyersViewMode" value="monthly" checked>
-    Monthly
-  </label>
-  <label style="display:flex;gap:.25rem;align-items:center">
-    <input type="radio" name="buyersViewMode" value="ytd">
-    Year-to-Date
-  </label>
+<!-- 🔹 Controls for Chart 1 -->
+<div id="controlsBudgetOverTime" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
+  <label><input type="radio" name="modeBudgetOverTime" value="monthly" checked> Monthly</label>
+  <label><input type="radio" name="modeBudgetOverTime" value="ytd"> Year-to-Date</label>
+  <select id="monthBudgetOverTime" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
+</div>
 
-  <select id="buyersMonthSelect" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem">
-    <!-- populated by JS with current-year months -->
-  </select>
+<!-- 🔹 Controls for Chart 2 -->
+<div id="controlsNationality" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
+  <label><input type="radio" name="modeNationality" value="monthly" checked> Monthly</label>
+  <label><input type="radio" name="modeNationality" value="ytd"> Year-to-Date</label>
+  <select id="monthNationality" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
+</div>
+
+<!-- 🔹 Controls for Chart 3 -->
+<div id="controlsBudgetByNationality" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
+  <label><input type="radio" name="modeBudgetByNationality" value="monthly" checked> Monthly</label>
+  <label><input type="radio" name="modeBudgetByNationality" value="ytd"> Year-to-Date</label>
+  <select id="monthBudgetByNationality" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
 
 <!-- Chart 1: Budget distribution over time -->
@@ -446,9 +452,8 @@ buyersMonthSelect.innerHTML = monthKeys.map(m => {
   return `<option value="${m}" ${d.getMonth()===new Date().getMonth() ? "selected":""}>${d.toLocaleString(undefined,{month:"long"})}</option>`;
 }).join("");
 
-// Controls
-let buyersViewMode = "monthly"; // 'monthly' | 'ytd'
-document.querySelectorAll('input[name="buyersViewMode"]').forEach(r => {
+
+
   r.addEventListener("change", (e) => {
     buyersViewMode = e.target.value;
     buyersMonthSelect.disabled = (buyersViewMode !== "monthly");
@@ -456,7 +461,7 @@ document.querySelectorAll('input[name="buyersViewMode"]').forEach(r => {
   });
 });
 buyersMonthSelect.disabled = false;
-buyersMonthSelect.addEventListener("change", renderAllBuyerCharts);
+
 
 // Helpers
 const PRICE_BUCKETS = [
@@ -653,17 +658,33 @@ function renderBudgetByNationality(mode, monthKey){
   });
 }
 
-function renderAllBuyerCharts(){
-  const mode = buyersViewMode;               // 'monthly'|'ytd'
-  const monthKey = buyersMonthSelect.value;  // YYYY-MM (used only in monthly)
-  renderBudgetOverTime(mode, monthKey);
-  renderNationality(mode, monthKey);
-  renderBudgetByNationality(mode, monthKey);
+
+function setupIndependentControls(chartName, renderFn) {
+  const radios = document.querySelectorAll(`input[name="mode${chartName}"]`);
+  const select = document.getElementById(`month${chartName}`);
+
+  // populate month options
+  select.innerHTML = monthKeys.map(m => {
+    const d = new Date(`${m}-01T00:00:00`);
+    return `<option value="${m}" ${d.getMonth()===new Date().getMonth() ? "selected":""}>${d.toLocaleString(undefined,{month:"long"})}</option>`;
+  }).join("");
+
+  let mode = "monthly";
+  radios.forEach(r => {
+    r.addEventListener("change", e => {
+      mode = e.target.value;
+      select.disabled = (mode !== "monthly");
+      renderFn(mode, select.value);
+    });
+  });
+  select.addEventListener("change", () => renderFn(mode, select.value));
+  renderFn(mode, select.value); // initial render
 }
 
-// Kick off once buyers are present
-if (buyersRaw.length){
-  renderAllBuyerCharts();
+if (buyersRaw.length) {
+  setupIndependentControls("BudgetOverTime", renderBudgetOverTime);
+  setupIndependentControls("Nationality", renderNationality);
+  setupIndependentControls("BudgetByNationality", renderBudgetByNationality);
 }
 
 
