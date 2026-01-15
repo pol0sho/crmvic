@@ -451,7 +451,7 @@ const buyersRaw = buyersBlock && Array.isArray(buyersBlock.data) ? buyersBlock.d
 
 
 // Build month list for current year (YYYY-MM)
-const monthKeys = [...Array(12).keys()].map(i => `${currentYear}-${String(i+1).padStart(2,"0")}`);
+const monthKeys = months;
 
 
 
