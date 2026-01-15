@@ -327,7 +327,7 @@ max-height: 60vh;
       </style>
     </head>
     <body>
-      <h2>AbraCasaBra Real Estate Statistics - {{ year }}</h2>
+      <h2>AbraCasaBra Real Estate Statistics (Last 24 Months)</h2>
     <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries & Wishlists</h3>
       <canvas id="inquiryChart"></canvas>
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown Per Portal</h3>
@@ -394,8 +394,17 @@ max-height: 60vh;
       return res.json();
     })
     .then(data => {
-      const year = new Date().getFullYear();
-      const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
+function buildLastNMonths(n = 24) {
+  const out = [];
+  const now = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+  }
+  return out;
+}
+
+const months = buildLastNMonths(24);
 
       const autoimport = [];
       const wishlist = [];
@@ -439,7 +448,7 @@ sources.forEach((src, i) => {
 // ====== Buyers charts (Budget & Nationality) ======
 const buyersBlock = data.buyers || data["buyers"] || null;
 const buyersRaw = buyersBlock && Array.isArray(buyersBlock.data) ? buyersBlock.data : [];
-const currentYear = new Date().getFullYear();
+
 
 // Build month list for current year (YYYY-MM)
 const monthKeys = [...Array(12).keys()].map(i => `${currentYear}-${String(i+1).padStart(2,"0")}`);
@@ -463,9 +472,11 @@ function toMonthKey(ts){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
 }
 
-function inCurrentYear(rec){
-  const d = new Date(rec.inquiry_date.replace(" ","T"));
-  return d.getFullYear() === currentYear;
+const monthSet = new Set(months);
+
+function inRange(rec) {
+  const mk = toMonthKey(rec.inquiry_date);
+  return mk && monthSet.has(mk);
 }
 
 function bucketIndex(price){
@@ -479,7 +490,7 @@ function bucketIndex(price){
 
 function aggregateBuyers() {
   // Filter to current year
-  const rows = buyersRaw.filter(inCurrentYear);
+ const rows = buyersRaw.filter(inRange);
 
   // Monthly map: ym -> rows[]
   const byMonth = new Map(monthKeys.map(m => [m, []]));
@@ -650,10 +661,12 @@ function setupIndependentControls(chartName, renderFn) {
   const select = document.getElementById(`month${chartName}`);
 
   // populate month options
-  select.innerHTML = monthKeys.map(m => {
-    const d = new Date(`${m}-01T00:00:00`);
-    return `<option value="${m}" ${d.getMonth()===new Date().getMonth() ? "selected":""}>${d.toLocaleString(undefined,{month:"long"})}</option>`;
-  }).join("");
+select.innerHTML = monthKeys.map(m => {
+  const d = new Date(`${m}-01T00:00:00`);
+  return `<option value="${m}">
+    ${d.toLocaleString(undefined,{month:"long", year:"numeric"})}
+  </option>`;
+}).join("");
 
   let mode = "monthly";
   radios.forEach(r => {
