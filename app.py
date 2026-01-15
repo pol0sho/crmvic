@@ -327,14 +327,14 @@ max-height: 60vh;
       </style>
     </head>
     <body>
-      <h2>AbraCasaBra Real Estate Statistics (Last 24 Months)</h2>
+      <h2>AbraCasaBra Real Estate Statistics (Since January 2025)</h2>
     <h3 style="text-align:center; margin-top:3rem;"> Auto import Inquiries & Wishlists</h3>
       <canvas id="inquiryChart"></canvas>
       <h3 style="text-align:center; margin-top:3rem;"> Monthly Inquiry Breakdown Per Portal</h3>
 <canvas id="sourceBreakdownChart"></canvas>
 
 <!-- === Buyers Budget & Nationality (New) === -->
-<h3 style="text-align:center; margin-top:3rem;">Buyer Budget & Nationality (Monthly / Year-to-Date)</h3>
+<h3 style="text-align:center; margin-top:3rem;">Buyer Budget & Nationality (Monthly / Since January 2025)</h3>
 
 
 <!-- Chart 1: Budget distribution over time -->
@@ -342,7 +342,7 @@ max-height: 60vh;
 <!-- 🔹 Controls for Chart 1 -->
 <div id="controlsBudgetOverTime" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
   <label><input type="radio" name="modeBudgetOverTime" value="monthly" checked> Monthly</label>
-  <label><input type="radio" name="modeBudgetOverTime" value="ytd"> Year-to-Date</label>
+  <label><input type="radio" name="modeBudgetOverTime" value="ytd"> Since January 2025</label>
   <select id="monthBudgetOverTime" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
 <canvas id="buyersBudgetOverTimeChart"></canvas>
@@ -352,7 +352,7 @@ max-height: 60vh;
 <!-- 🔹 Controls for Chart 2 -->
 <div id="controlsNationality" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
   <label><input type="radio" name="modeNationality" value="monthly" checked> Monthly</label>
-  <label><input type="radio" name="modeNationality" value="ytd"> Year-to-Date</label>
+  <label><input type="radio" name="modeNationality" value="ytd"> Since January 2025</label>
   <select id="monthNationality" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
 <canvas id="buyersNationalityChart"></canvas>
@@ -362,7 +362,7 @@ max-height: 60vh;
 <!-- 🔹 Controls for Chart 3 -->
 <div id="controlsBudgetByNationality" style="max-width:1400px;margin:1rem auto;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;justify-content:center">
   <label><input type="radio" name="modeBudgetByNationality" value="monthly" checked> Monthly</label>
-  <label><input type="radio" name="modeBudgetByNationality" value="ytd"> Year-to-Date</label>
+  <label><input type="radio" name="modeBudgetByNationality" value="ytd"> Since January 2025</label>
   <select id="monthBudgetByNationality" style="padding:.4rem .6rem;border:1px solid #ddd;border-radius:.4rem"></select>
 </div>
 <canvas id="buyersBudgetByNationalityChart"></canvas>
@@ -404,7 +404,9 @@ function buildLastNMonths(n = 24) {
   return out;
 }
 
-const months = buildLastNMonths(24);
+const months = Object.keys(data)
+  .filter(k => /^\d{4}-\d{2}$/.test(k))
+  .sort();
 
       const autoimport = [];
       const wishlist = [];
