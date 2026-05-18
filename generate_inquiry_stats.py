@@ -370,7 +370,7 @@ def generate_inquiry_stats():
 
     sources = [
         "Subject: Kyero.com",
-        "Subject: Idealista",
+        "Subject: Nuevo mensaje de",
         "Subject: Indomio",
         "Subject: AbraCasaBra Form",
         "Subject: thinkSPAIN",
